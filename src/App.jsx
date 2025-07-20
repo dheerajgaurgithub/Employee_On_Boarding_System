@@ -5,6 +5,7 @@ import Login from './components/Login';
 import AdminDashboard from './components/Dashboard/AdminDashboard';
 import HRDashboard from './components/Dashboard/HRDashboard';
 import EmployeeDashboard from './components/Dashboard/EmployeeDashboard';
+import LandingPage from './components/LandingPage';
 
 const AppContent = () => {
   const { currentUser, loading } = useAuth();
@@ -20,7 +21,7 @@ const AppContent = () => {
     );
   }
   if (!currentUser) {
-    return <Login />;
+    return <LandingPage />;
   }
 
   switch (currentUser.role) {
