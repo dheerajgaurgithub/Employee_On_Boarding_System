@@ -69,6 +69,11 @@ app.use('/api/meetings', meetingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/messages', messageRoutes);
 
+// Default root route to avoid "Cannot GET /"
+app.get('/', (req, res) => {
+  res.send('✅ Employee Onboarding System Backend is Running!');
+});
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
