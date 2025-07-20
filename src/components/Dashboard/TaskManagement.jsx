@@ -324,6 +324,10 @@ const TaskManagement = ({ role }) => {
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
                           {task.status.replace('-', ' ').toUpperCase()}
                         </span>
+                        {/* Approval status badge */}
+                        {task.status === 'completed' && (
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full border ${task.approvalStatus === 'approved' ? 'bg-green-100 text-green-800 border-green-200' : task.approvalStatus === 'rejected' ? 'bg-red-100 text-red-800 border-red-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200'}`}>{task.approvalStatus ? task.approvalStatus.toUpperCase() : 'PENDING APPROVAL'}</span>
+                        )}
                       </div>
                       
                       {task.description && (
@@ -372,6 +376,23 @@ const TaskManagement = ({ role }) => {
                             Complete
                           </button>
                         )}
+                      </div>
+                    )}
+                    {/* Approve/Reject buttons for HR/Admin */}
+                    {role !== 'employee' && task.status === 'completed' && task.approvalStatus === 'pending' && (
+                      <div className="flex flex-col space-y-2 ml-4">
+                        <button
+                          onClick={async () => await updateTask(task._id, { approvalStatus: 'approved' })}
+                          className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={async () => await updateTask(task._id, { approvalStatus: 'rejected' })}
+                          className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+                        >
+                          Reject
+                        </button>
                       </div>
                     )}
                   </div>
