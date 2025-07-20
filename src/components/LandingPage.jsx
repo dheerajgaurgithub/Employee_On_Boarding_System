@@ -9,11 +9,11 @@ const LandingPage = () => (
       </p>
       <div className="mb-6">
         <h2 className="text-2xl font-semibold text-gray-800 mb-2">About the Developer</h2>
-        <p className="text-gray-700 mb-1">Name: <span className="font-medium">Dheeraj Kumar</span></p>
+        <p className="text-gray-700 mb-1">Name: <span className="font-medium">Dheeraj Gaur</span></p>
         <p className="text-gray-700 mb-1">Role: Full Stack Developer</p>
         <p className="text-gray-700 mb-1">Email: dheerajgaur.0fficial@gmail.com</p>
         <p className="text-gray-700">Passionate about building scalable web applications and delivering robust solutions for real-world problems.</p>
-        <link rel="stylesheet" href="https://dheerajgaurofficial.netlify.app/" />
+        <link className="text-blue-700" rel="stylesheet" href="https://dheerajgaurofficial.netlify.app/" />
       </div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-2">Backend API</h2>
