@@ -29,7 +29,7 @@ app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/employee_onboarding', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://dheerajgaurcs23:dheerajgaurcs23@cluster0.9gslzuz.mongodb.net/', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })

@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://employee-on-boarding-system.onrender.com';
+const API_BASE_URL = 'https://employee-on-boarding-system.onrender.com/api';
 
 class ApiService {
   constructor() {
