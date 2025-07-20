@@ -73,7 +73,10 @@ router.put('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
-    
+    let notifyUserId = null;
+    let notificationTitle = '';
+    let notificationMessage = '';
+
     // Handle task completion with submission
     if (updates.status === 'completed') {
       updates.submittedAt = new Date();
@@ -84,33 +87,82 @@ router.put('/:id', auth, async (req, res) => {
           notes: updates.submission.notes
         };
       }
+      // Notify assigner about completion
+      notifyUserId = (await Task.findById(id)).assignedBy;
+      notificationTitle = 'Task Completed';
+      notificationMessage = `Task "${updates.title || ''}" has been completed with document submission.`;
     }
-    
+
+    // Handle approval/rejection by HR/Admin
+    if (updates.approvalStatus && ['approved', 'rejected'].includes(updates.approvalStatus)) {
+      const taskDoc = await Task.findById(id);
+      notifyUserId = taskDoc.assignedTo;
+      notificationTitle = `Task ${updates.approvalStatus.charAt(0).toUpperCase() + updates.approvalStatus.slice(1)}`;
+      notificationMessage = `Your task "${taskDoc.title}" has been ${updates.approvalStatus}.`;
+    }
+
     const task = await Task.findByIdAndUpdate(id, updates, { new: true })
       .populate('assignedTo', 'name email role')
       .populate('assignedBy', 'name email role');
-    
+
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
-    
-    // Notify assigner about status change
-    if (updates.status) {
-      const notificationMessage = updates.status === 'completed' && updates.submission
-        ? `Task "${task.title}" has been completed with document submission`
-        : `Task "${task.title}" status changed to ${updates.status}`;
 
+    // Send notification if needed
+    if (notifyUserId && notificationTitle && notificationMessage) {
       const notification = new Notification({
-        userId: task.assignedBy._id,
-        title: 'Task Status Updated',
+        userId: notifyUserId,
+        title: notificationTitle,
         message: notificationMessage,
         type: 'task'
       });
       await notification.save();
-      
+      req.io.to(notifyUserId.toString()).emit('new_notification', notification);
+    }
+
+    // Notify assigner about status change (if not already notified)
+    if (updates.status && !notifyUserId) {
+      const notification = new Notification({
+        userId: task.assignedBy._id,
+        title: 'Task Status Updated',
+        message: `Task "${task.title}" status changed to ${updates.status}`,
+        type: 'task'
+      });
+      await notification.save();
       req.io.to(task.assignedBy._id.toString()).emit('new_notification', notification);
     }
-    
+
+    res.json(task);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Approve or reject a submitted task (HR/Admin only)
+router.put('/:id/approval', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { approvalStatus } = req.body;
+    if (!['approved', 'rejected'].includes(approvalStatus)) {
+      return res.status(400).json({ message: 'Invalid approval status' });
+    }
+    const task = await Task.findByIdAndUpdate(id, { approvalStatus }, { new: true })
+      .populate('assignedTo', 'name email role')
+      .populate('assignedBy', 'name email role');
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+    // Notify employee
+    const notification = new Notification({
+      userId: task.assignedTo._id,
+      title: `Task ${approvalStatus.charAt(0).toUpperCase() + approvalStatus.slice(1)}`,
+      message: `Your task "${task.title}" has been ${approvalStatus}.`,
+      type: 'task'
+    });
+    await notification.save();
+    req.io.to(task.assignedTo._id.toString()).emit('new_notification', notification);
     res.json(task);
   } catch (error) {
     console.error(error);
