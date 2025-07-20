@@ -13,7 +13,7 @@ const LandingPage = () => (
         <p className="text-gray-700 mb-1">Role: Full Stack Developer</p>
         <p className="text-gray-700 mb-1">Email: dheerajgaur.0fficial@gmail.com</p>
         <p className="text-gray-700">Passionate about building scalable web applications and delivering robust solutions for real-world problems.</p>
-        <link className="text-blue-700" rel="stylesheet" href="https://dheerajgaurofficial.netlify.app/" />
+        <a href="https://dheerajgaurofficial.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://dheerajgaurofficial.netlify.app/</a>
       </div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-2">Backend API</h2>
