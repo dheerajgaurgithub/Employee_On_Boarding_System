@@ -251,6 +251,12 @@ class ApiService {
       body: JSON.stringify(messageData),
     });
   }
+
+  async markMessageRead(messageId) {
+    return this.request(`/messages/${messageId}/read`, {
+      method: 'PUT',
+    });
+  }
 }
 
 export default new ApiService();

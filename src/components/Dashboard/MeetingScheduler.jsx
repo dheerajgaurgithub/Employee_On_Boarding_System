@@ -254,6 +254,18 @@ const MeetingScheduler = ({ role }) => {
                         </button>
                       </div>
                     )}
+                    {meeting.status === 'scheduled' && meeting.googleMeetLink && (
+                      <div className="flex space-x-2 ml-4 mt-2">
+                        <a
+                          href={meeting.googleMeetLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                          Join Meeting
+                        </a>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="mt-3 pt-3 border-t border-gray-200">

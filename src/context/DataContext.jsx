@@ -99,10 +99,10 @@ export const DataProvider = ({ children }) => {
   };
 
   const getTasksByUser = useCallback((userId) => 
-    tasks.filter(t => t.assignedTo._id === userId), [tasks]);
+    tasks.filter(t => t.assignedTo && t.assignedTo._id === userId), [tasks]);
 
   const getTasksByAssigner = useCallback((assignerId) => 
-    tasks.filter(t => t.assignedBy._id === assignerId), [tasks]);
+    tasks.filter(t => t.assignedBy && t.assignedBy._id === assignerId), [tasks]);
 
   // -------------------- Leave Methods --------------------
   const addLeaveRequest = async (data) => {
@@ -128,10 +128,10 @@ export const DataProvider = ({ children }) => {
   };
 
   const getLeavesByUser = useCallback((userId) => 
-    leaveRequests.filter(l => l.employeeId._id === userId), [leaveRequests]);
+    leaveRequests.filter(l => l.employeeId && l.employeeId._id === userId), [leaveRequests]);
 
   const getLeavesByApprover = useCallback((approverId) => 
-    leaveRequests.filter(l => l.appliedTo._id === approverId), [leaveRequests]);
+    leaveRequests.filter(l => l.appliedTo && l.appliedTo._id === approverId), [leaveRequests]);
 
   // -------------------- Attendance Methods --------------------
   const addAttendance = async (data) => {
@@ -146,7 +146,7 @@ export const DataProvider = ({ children }) => {
   };
 
   const getAttendanceByUser = useCallback((userId) => 
-    attendance.filter(a => a.employeeId._id === userId), [attendance]);
+    attendance.filter(a => a.employeeId && a.employeeId._id === userId), [attendance]);
 
   const getTodayAttendance = useCallback(() => {
     const today = new Date().toDateString();
@@ -177,7 +177,7 @@ export const DataProvider = ({ children }) => {
   };
 
   const getMeetingsByUser = useCallback((userId) => 
-    meetings.filter(m => m.scheduledBy._id === userId || m.attendees.some(a => a._id === userId)), [meetings]);
+    meetings.filter(m => (m.scheduledBy && m.scheduledBy._id === userId) || (m.attendees && m.attendees.some(a => a && a._id === userId))), [meetings]);
 
   // -------------------- Notification Methods --------------------
   const addNotification = async (data) => {
@@ -214,7 +214,7 @@ export const DataProvider = ({ children }) => {
 
   const getNotificationsByUser = useCallback((userId) =>
     notifications
-      .filter(n => n.userId === userId || n.userId._id === userId)
+      .filter(n => (n.userId === userId) || (n.userId && n.userId._id === userId))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)), [notifications]);
 
   // -------------------- Message Methods --------------------
@@ -233,6 +233,7 @@ export const DataProvider = ({ children }) => {
     try {
       const msg = await apiService.sendMessage(data);
       setMessages(prev => [...prev, msg]);
+      await loadNotifications(); // Refresh notifications after sending a message
       return msg;
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -240,10 +241,25 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const markMessageRead = async (messageId) => {
+    try {
+      await apiService.markMessageRead(messageId);
+      setMessages(prev => prev.map(m => m._id === messageId ? { ...m, read: true } : m));
+    } catch (error) {
+      console.error('Failed to mark message as read:', error);
+    }
+  };
+
   const getMessagesBetweenUsers = useCallback((u1, u2) => 
     messages
-      .filter(m => (m.senderId._id === u1 && m.receiverId._id === u2) || 
-                    (m.senderId._id === u2 && m.receiverId._id === u1))
+      .filter(m => {
+        const senderId = typeof m.senderId === 'object' ? m.senderId._id : m.senderId;
+        const receiverId = typeof m.receiverId === 'object' ? m.receiverId._id : m.receiverId;
+        return (
+          (senderId === u1 && receiverId === u2) || 
+          (senderId === u2 && receiverId === u1)
+        );
+      })
       .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)), [messages]);
 
   // -------------------- Auto-load when currentUser changes --------------------

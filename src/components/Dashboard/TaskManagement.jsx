@@ -12,7 +12,8 @@ const TaskManagement = ({ role }) => {
     description: '',
     assignedTo: '',
     priority: 'medium',
-    dueDate: ''
+    dueDate: '',
+    allowedFormats: ['pdf', 'doc', 'text']
   });
 
   const targetUsers = role === 'admin' ? getUsersByRole('hr') : getUsersByRole('employee').filter(emp => emp.createdBy === currentUser._id);
@@ -65,7 +66,7 @@ const TaskManagement = ({ role }) => {
 
   const renderSubmissionForm = (task) => {
     if (role !== 'employee' || task.status !== 'in-progress') return null;
-
+    const allowedFormats = task.allowedFormats || ['pdf', 'doc', 'text'];
     return (
       <div className="mt-4 pt-4 border-t border-gray-200">
         <h4 className="text-sm font-medium text-gray-900 mb-2">Task Submission</h4>
@@ -87,9 +88,9 @@ const TaskManagement = ({ role }) => {
               onChange={(e) => setSubmissionData({...submissionData, documentType: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
-              <option value="pdf">PDF</option>
-              <option value="text">Text</option>
-              <option value="other">Other</option>
+              {allowedFormats.map(fmt => (
+                <option key={fmt} value={fmt}>{fmt.toUpperCase()}</option>
+              ))}
             </select>
           </div>
           <div>
@@ -239,6 +240,29 @@ const TaskManagement = ({ role }) => {
                 </div>
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Allowed Submission Formats
+                </label>
+                <div className="flex space-x-4">
+                  {['pdf', 'doc', 'text'].map(fmt => (
+                    <label key={fmt} className="inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.allowedFormats.includes(fmt)}
+                        onChange={e => {
+                          setFormData(prev => ({
+                            ...prev,
+                            allowedFormats: e.target.checked
+                              ? [...prev.allowedFormats, fmt]
+                              : prev.allowedFormats.filter(f => f !== fmt)
+                          }));
+                        }}
+                        className="form-checkbox"
+                      />
+                      <span className="ml-2 capitalize">{fmt}</span>
+                    </label>
+                  ))}
+                </div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
                 </label>

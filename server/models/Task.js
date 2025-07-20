@@ -25,6 +25,11 @@ const taskSchema = new mongoose.Schema({
     enum: ['pending', 'in-progress', 'completed'],
     default: 'pending'
   },
+  approvalStatus: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
+  },
   priority: {
     type: String,
     enum: ['low', 'medium', 'high'],

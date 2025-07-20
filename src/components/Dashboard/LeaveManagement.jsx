@@ -242,7 +242,7 @@ const LeaveManagement = ({ role }) => {
                         <span
                           className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
                             leave.status
-                          )}`}
+                          )} ${["approved","rejected"].includes(leave.status) ? "font-bold italic" : ""}`}
                         >
                           {leave.status.toUpperCase()}
                         </span>
@@ -295,6 +295,13 @@ const LeaveManagement = ({ role }) => {
 
                   {leave.respondedAt && (
                     <div className="mt-3 pt-3 border-t border-gray-200 text-sm text-gray-600">
+                      <span className="font-bold italic">
+                        {leave.status === "approved"
+                          ? "Your leave request has been approved. "
+                          : leave.status === "rejected"
+                          ? "Your leave request has been rejected. "
+                          : ""}
+                      </span>
                       Response given on{' '}
                       {new Date(leave.respondedAt).toLocaleDateString()}
                     </div>

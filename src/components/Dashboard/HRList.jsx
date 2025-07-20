@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { Users, Edit, DollarSign, Phone, Mail, Circle, MessageCircle } from 'lucide-react';
 
-const HRList = () => {
+const HRList = ({ onMessageHR }) => {
   const { getUsersByRole, updateUser } = useAuth();
   const { getTasksByAssigner, getLeavesByApprover } = useData();
   const [editingSalary, setEditingSalary] = useState(null);
@@ -156,7 +156,8 @@ const HRList = () => {
                   </div>
 
                   <div className="mt-4">
-                    <button className="w-full flex items-center justify-center space-x-2 px-3 py-2 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
+                    <button className="w-full flex items-center justify-center space-x-2 px-3 py-2 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+                      onClick={onMessageHR ? () => onMessageHR(hr) : undefined}>
                       <MessageCircle className="w-4 h-4" />
                       <span>Message HR</span>
                     </button>

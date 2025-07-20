@@ -1,70 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { MessageCircle, Send, User, Circle } from 'lucide-react';
+import Message from './Message';
+import io from 'socket.io-client';
 
-const ChatSystem = () => {
-  const { currentUser, getUsersByRole, getUserById } = useAuth();
-  const { addMessage, getMessagesBetweenUsers } = useData();
-  const [selectedChat, setSelectedChat] = useState(null);
+const socket = io("http://localhost:5000");
+
+const ChatSystem = ({ chatRole = "hr", initialTarget = null, onClose }) => {
+  const { currentUser, getUsersByRole } = useAuth();
+  const { addMessage, getMessagesBetweenUsers, loadMessages, markMessageRead } = useData();
+  const [selectedChat, setSelectedChat] = useState(initialTarget);
   const [messageText, setMessageText] = useState('');
+  const messagesEndRef = useRef(null);
 
-  const employees = getUsersByRole('employee').filter(emp => emp.createdBy === currentUser.id);
+  // Determine who to chat with
+  let chatTargets = [];
+  if (chatRole === "admin") {
+    chatTargets = getUsersByRole('hr').filter(hr => hr.createdBy === currentUser._id);
+  } else if (chatRole === "hr") {
+    const admins = getUsersByRole('admin');
+    const employees = getUsersByRole('employee').filter(emp => emp.createdBy === currentUser._id);
+    chatTargets = [...admins, ...employees];
+  } else if (chatRole === "employee") {
+    chatTargets = getUsersByRole('hr').filter(hr => hr._id === currentUser.createdBy);
+  }
 
+  // Send message
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!messageText.trim() || !selectedChat) return;
 
     addMessage({
-      senderId: currentUser.id,
-      receiverId: selectedChat.id,
+      senderId: currentUser._id,
+      receiverId: selectedChat._id,
       content: messageText,
       type: 'text'
+    });
+
+    socket.emit("send_message", {
+      to: selectedChat._id,
+      from: currentUser._id,
+      content: messageText,
     });
 
     setMessageText('');
   };
 
-  const messages = selectedChat ? getMessagesBetweenUsers(currentUser.id, selectedChat.id) : [];
+  // Get messages between users
+  const messages = selectedChat ? getMessagesBetweenUsers(currentUser._id, selectedChat._id) : [];
+
+  // Mark unread messages as read
+  useEffect(() => {
+    if (selectedChat && messages.length > 0) {
+      messages.forEach((msg) => {
+        if (!msg.read && msg.receiverId === currentUser._id) {
+          markMessageRead(msg._id);
+        }
+      });
+    }
+  }, [selectedChat, messages]);
+
+  // Load messages when user is selected
+  useEffect(() => {
+    if (selectedChat) {
+      loadMessages(selectedChat._id);
+    }
+  }, [selectedChat]);
+
+  // Join room
+  useEffect(() => {
+    if (currentUser) {
+      socket.emit("join_room", currentUser._id);
+    }
+  }, [currentUser]);
+
+  // Listen for messages
+  useEffect(() => {
+    socket.on("receive_message", () => {
+      if (selectedChat?._id) {
+        loadMessages(selectedChat._id);
+      }
+    });
+
+    return () => {
+      socket.off("receive_message");
+    };
+  }, [selectedChat]);
+
+  // Auto-scroll to latest message
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   return (
-    <div className="bg-white rounded-lg shadow h-96 flex">
+    <div className="bg-white rounded-lg shadow h-96 flex relative">
+      {onClose && (
+        <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold">&times;</button>
+      )}
       {/* Chat List */}
       <div className="w-1/3 border-r border-gray-200">
         <div className="p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Employees</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            {chatRole === "admin" ? "HR Members" : "Employees"}
+          </h3>
         </div>
         <div className="overflow-y-auto h-80">
-          {employees.length === 0 ? (
+          {chatTargets.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
               <User className="w-8 h-8 mx-auto mb-2" />
-              <p>No employees to chat with</p>
+              <p>No {chatRole === "admin" ? "HR members" : "employees"} to chat with</p>
             </div>
           ) : (
-            employees.map((employee) => (
+            chatTargets.map((target) => (
               <button
-                key={employee.id}
-                onClick={() => setSelectedChat(employee)}
+                key={target._id}
+                onClick={() => setSelectedChat(target)}
                 className={`w-full p-4 text-left hover:bg-gray-50 border-b border-gray-100 ${
-                  selectedChat?.id === employee.id ? 'bg-blue-50' : ''
+                  selectedChat?._id === target._id ? 'bg-blue-50' : ''
                 }`}
               >
                 <div className="flex items-center space-x-3">
                   <img
-                    src={employee.profilePicture}
-                    alt={employee.name}
+                    src={target.profilePicture}
+                    alt={target.name}
                     className="w-8 h-8 rounded-full"
                   />
                   <div>
-                    <div className="font-medium text-gray-900">{employee.name}</div>
+                    <div className="font-medium text-gray-900">{target.name}</div>
                     <div className="flex items-center space-x-1">
                       <Circle
                         className={`w-2 h-2 ${
-                          employee.isOnline ? 'text-green-500 fill-current' : 'text-gray-400'
+                          target.isOnline ? 'text-green-500 fill-current' : 'text-gray-400'
                         }`}
                       />
                       <span className="text-xs text-gray-500">
-                        {employee.isOnline ? 'Online' : 'Offline'}
+                        {target.isOnline ? 'Online' : 'Offline'}
                       </span>
                     </div>
                   </div>
@@ -111,27 +184,16 @@ const ChatSystem = () => {
                   <p>No messages yet. Start the conversation!</p>
                 </div>
               ) : (
-                messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.senderId === currentUser.id ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-xs px-3 py-2 rounded-lg ${
-                        message.senderId === currentUser.id
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-900'
-                      }`}
-                    >
-                      <p>{message.content}</p>
-                      <p className={`text-xs mt-1 ${
-                        message.senderId === currentUser.id ? 'text-blue-200' : 'text-gray-500'
-                      }`}>
-                        {new Date(message.createdAt).toLocaleTimeString()}
-                      </p>
-                    </div>
-                  </div>
-                ))
+                <>
+                  {messages.map((message) => (
+                    <Message
+                      key={message._id}
+                      message={message}
+                      isOwn={message.senderId === currentUser._id}
+                    />
+                  ))}
+                  <div ref={messagesEndRef}></div>
+                </>
               )}
             </div>
 
@@ -158,7 +220,7 @@ const ChatSystem = () => {
           <div className="flex-1 flex items-center justify-center text-gray-500">
             <div className="text-center">
               <MessageCircle className="w-12 h-12 mx-auto mb-4" />
-              <p>Select an employee to start chatting</p>
+              <p>Select a user to start chatting</p>
             </div>
           </div>
         )}

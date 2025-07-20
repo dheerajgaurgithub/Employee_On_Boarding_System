@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Load current user from token
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -40,42 +41,27 @@ export const AuthProvider = ({ children }) => {
   };
 
   const loadUsers = async () => {
-    try {
-      let allUsers;
-      if (!currentUser?.role) {
-        console.error('No user role found:', currentUser);
-        return;
-      }
+    if (!currentUser?.role) {
+      console.warn('No user role to determine user scope.');
+      return;
+    }
 
-      console.log(`Loading users for role: ${currentUser.role}`);
-      
+    try {
+      let allUsers = [];
+
       if (currentUser.role === 'admin') {
         allUsers = await apiService.getUsers();
-        console.log('Admin: Loaded all users:', allUsers.length);
       } else if (currentUser.role === 'hr') {
-        // HR needs access to both admin and employee users
-        const employees = await apiService.getUsersByRole('employee');
-        const admins = await apiService.getUsersByRole('admin');
+        const [employees, admins] = await Promise.all([
+          apiService.getUsersByRole('employee'),
+          apiService.getUsersByRole('admin'),
+        ]);
         allUsers = [...employees, ...admins];
-        console.log('HR: Loaded employees and admins:', allUsers.length);
       } else if (currentUser.role === 'employee') {
-        // Employee needs access to their HR
-        if (!currentUser.createdBy) {
-          console.error('Employee has no assigned HR (createdBy):', currentUser);
-          return;
-        }
         const hrs = await apiService.getUsersByRole('hr');
         allUsers = hrs.filter(hr => hr._id === currentUser.createdBy);
-        console.log('Employee: Found HR:', allUsers.length > 0);
-      } else {
-        console.warn('Unknown user role:', currentUser.role);
-        allUsers = [];
       }
-      
-      if (!allUsers?.length) {
-        console.warn('No users loaded for role:', currentUser.role);
-      }
-      
+
       setUsers(allUsers);
     } catch (error) {
       console.error('Failed to load users:', error);
@@ -119,10 +105,10 @@ export const AuthProvider = ({ children }) => {
   const updateUser = async (userId, updates) => {
     try {
       const updatedUser = await apiService.updateUser(userId, updates);
-      setUsers((prev) =>
-        prev.map((u) => (u._id === userId ? updatedUser : u))
+      setUsers(prev =>
+        prev.map(user => (user._id === userId ? updatedUser : user))
       );
-      if (currentUser && currentUser._id === userId) {
+      if (currentUser?._id === userId) {
         setCurrentUser(updatedUser);
       }
       return updatedUser;
@@ -133,18 +119,27 @@ export const AuthProvider = ({ children }) => {
   };
 
   const getUsersByRole = (role) => {
-    if (role === 'hr' && currentUser?.role === 'admin') {
-      return users.filter((u) => u.role === role);
-    } else if (role === 'employee' && currentUser?.role === 'hr') {
+    if (!currentUser) return [];
+
+    if (role === 'hr' && currentUser.role === 'admin') {
+      return users.filter(user => user.role === 'hr');
+    }
+
+    if (role === 'employee' && currentUser.role === 'hr') {
       return users.filter(
-        (u) => u.role === role && u.createdBy === currentUser._id
+        user => user.role === 'employee' && user.createdBy === currentUser._id
       );
     }
-    return users.filter((u) => u.role === role);
+
+    if (role === 'hr' && currentUser.role === 'employee') {
+      return users.filter(user => user._id === currentUser.createdBy);
+    }
+
+    return users.filter(user => user.role === role);
   };
 
   const getUserById = (id) => {
-    return users.find((u) => u._id === id);
+    return users.find(user => user._id === id);
   };
 
   useEffect(() => {
@@ -155,6 +150,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     currentUser,
+    setCurrentUser,
     users,
     loading,
     login,

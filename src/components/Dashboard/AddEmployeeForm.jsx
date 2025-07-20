@@ -39,7 +39,7 @@ const AddEmployeeForm = () => {
         email,
         password,
         role: 'employee',
-        createdBy: currentUser.id,
+        createdBy: currentUser._id,
         salary: parseFloat(formData.salary)
       };
 

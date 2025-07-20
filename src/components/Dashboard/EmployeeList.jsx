@@ -3,13 +3,15 @@ import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { Users, Edit, DollarSign, Phone, Mail, Circle, MessageCircle, CheckSquare, Calendar } from 'lucide-react';
 
-const EmployeeList = () => {
+const EmployeeList = ({ showAll = false, onChat }) => {
   const { currentUser, getUsersByRole, updateUser } = useAuth();
   const { getTasksByUser, getAttendanceByUser } = useData();
   const [editingSalary, setEditingSalary] = useState(null);
   const [newSalary, setNewSalary] = useState('');
 
-  const employees = getUsersByRole('employee').filter(emp => emp.createdBy === currentUser._id);
+  const employees = showAll
+    ? getUsersByRole('employee')
+    : getUsersByRole('employee').filter(emp => emp.createdBy === currentUser._id);
 
   const handleSalaryUpdate = (employeeId) => {
     if (newSalary && parseFloat(newSalary) > 0) {
@@ -144,7 +146,8 @@ const EmployeeList = () => {
                   </div>
 
                   <div className="mt-4 flex space-x-2">
-                    <button className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
+                    <button className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+                      onClick={onChat ? () => onChat(employee) : undefined}>
                       <MessageCircle className="w-4 h-4" />
                       <span>Chat</span>
                     </button>

@@ -14,14 +14,26 @@ import {
   Settings,
   Bell,
   LogOut,
-  Activity
+  Activity,
+  MessageCircle
 } from 'lucide-react';
+import ChatSystem from './ChatSystem';
 
 const EmployeeDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatTarget, setChatTarget] = useState(null);
   const { currentUser, logout } = useAuth();
   const { getNotificationsByUser } = useData();
+  const { getUsersByRole } = useAuth();
+  const hrUsers = getUsersByRole('hr');
 
+  // Auto-select first HR as chat target when opening chat tab
+  React.useEffect(() => {
+    if (chatOpen && !chatTarget && hrUsers.length > 0) {
+      setChatTarget(hrUsers[0]);
+    }
+  }, [chatOpen, chatTarget, hrUsers]);
   const notifications = getNotificationsByUser(currentUser.id);
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -30,6 +42,7 @@ const EmployeeDashboard = () => {
     { id: 'tasks', label: 'My Tasks', icon: CheckSquare },
     { id: 'meetings', label: 'Meetings', icon: Calendar },
     { id: 'leaves', label: 'Leave Requests', icon: FileText },
+    { id: 'chat', label: 'Chat', icon: MessageCircle },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'profile', label: 'Profile', icon: Settings }
   ];
@@ -44,6 +57,8 @@ const EmployeeDashboard = () => {
         return <MeetingScheduler role="employee" />;
       case 'leaves':
         return <LeaveManagement role="employee" />;
+      case 'chat':
+        return <ChatSystem chatRole="employee" />;
       case 'notifications':
         return <NotificationPanel />;
       case 'profile':
@@ -105,7 +120,12 @@ const EmployeeDashboard = () => {
                   return (
                     <li key={tab.id}>
                       <button
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={() => {
+                          setActiveTab(tab.id);
+                          if (tab.id === 'chat') {
+                            setChatOpen(true);
+                          }
+                        }}
                         className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
                           activeTab === tab.id
                             ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500'
@@ -133,6 +153,13 @@ const EmployeeDashboard = () => {
           </div>
         </div>
       </div>
+      {chatOpen && (
+        <ChatSystem
+          chatRole="employee"
+          initialTarget={chatTarget}
+          onClose={() => setChatOpen(false)}
+        />
+      )}
     </div>
   );
 };

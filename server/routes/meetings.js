@@ -35,14 +35,17 @@ router.get('/', auth, async (req, res) => {
 router.post('/', auth, async (req, res) => {
   try {
     const { title, description, attendees, dateTime, duration } = req.body;
-    
+    // Generate a Google Meet link (simple random string for demo, replace with real API in production)
+    const randomString = Math.random().toString(36).substring(2, 10);
+    const googleMeetLink = `https://meet.google.com/${randomString}`;
     const meeting = new Meeting({
       title,
       description,
       scheduledBy: req.user._id,
       attendees,
       dateTime,
-      duration
+      duration,
+      googleMeetLink
     });
     
     await meeting.save();

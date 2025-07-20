@@ -90,7 +90,7 @@ router.post('/', auth, authorize('hr', 'admin'), async (req, res) => {
     const { employeeId, status, checkInTime } = req.body;
 
     // Validate required fields
-    if (!employeeId || !status || !checkInTime) {
+    if (!employeeId || !status || (status === 'present' && !checkInTime)) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import DashboardStats from './DashboardStats';
@@ -9,6 +9,8 @@ import LeaveManagement from './LeaveManagement';
 import MeetingScheduler from './MeetingScheduler';
 import ProfileSettings from './ProfileSettings';
 import NotificationPanel from './NotificationPanel';
+import EmployeeList from './EmployeeList';
+import ChatSystem from './ChatSystem';
 import { 
   Users, 
   UserPlus, 
@@ -17,28 +19,43 @@ import {
   FileText, 
   Settings,
   Bell,
-  LogOut
+  LogOut,
+  MessageCircle
 } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { currentUser, logout, getUsersByRole } = useAuth();
   const { getNotificationsByUser } = useData();
-
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatTarget, setChatTarget] = useState(null);
   const hrUsers = getUsersByRole('hr');
   const notifications = getNotificationsByUser(currentUser.id);
   const unreadCount = notifications.filter(n => !n.read).length;
 
+  // Auto-select first HR as chat target when opening chat tab
+  useEffect(() => {
+    if (chatOpen && !chatTarget && hrUsers.length > 0) {
+      setChatTarget(hrUsers[0]);
+    }
+  }, [chatOpen, chatTarget, hrUsers]);
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Users },
     { id: 'add-hr', label: 'Add HR', icon: UserPlus },
     { id: 'hr-list', label: 'HR Management', icon: Users },
+    { id: 'employees', label: 'Employee Management', icon: Users },
     { id: 'tasks', label: 'Tasks', icon: CheckSquare },
     { id: 'meetings', label: 'Meetings', icon: Calendar },
     { id: 'leaves', label: 'Leave Requests', icon: FileText },
+    { id: 'chat', label: 'Chat', icon: MessageCircle },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'profile', label: 'Profile', icon: Settings }
   ];
+
+  const handleMessageHR = (hr) => {
+    setChatTarget(hr);
+    setChatOpen(true);
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -47,13 +64,17 @@ const AdminDashboard = () => {
       case 'add-hr':
         return <AddHRForm />;
       case 'hr-list':
-        return <HRList />;
+        return <HRList onMessageHR={handleMessageHR} />;
+      case 'employees':
+        return <EmployeeList showAll={true} />;
       case 'tasks':
         return <TaskManagement role="admin" />;
       case 'meetings':
         return <MeetingScheduler role="admin" />;
       case 'leaves':
         return <LeaveManagement role="admin" />;
+      case 'chat':
+        return <ChatSystem chatRole="admin" />;
       case 'notifications':
         return <NotificationPanel />;
       case 'profile':
@@ -115,7 +136,12 @@ const AdminDashboard = () => {
                   return (
                     <li key={tab.id}>
                       <button
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={() => {
+                          setActiveTab(tab.id);
+                          if (tab.id === 'chat') {
+                            setChatOpen(true);
+                          }
+                        }}
                         className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
                           activeTab === tab.id
                             ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500'
@@ -140,6 +166,13 @@ const AdminDashboard = () => {
           {/* Main Content */}
           <div className="flex-1">
             {renderTabContent()}
+            {chatOpen && (
+              <ChatSystem
+                chatRole="admin"
+                initialTarget={chatTarget}
+                onClose={() => setChatOpen(false)}
+              />
+            )}
           </div>
         </div>
       </div>

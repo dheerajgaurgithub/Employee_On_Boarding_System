@@ -16,7 +16,7 @@ const ProfileSettings = () => {
     setSaving(true);
 
     try {
-      updateUser(currentUser.id, formData);
+      updateUser(currentUser._id, formData);
       // Show success feedback here if needed
     } catch (error) {
       console.error('Failed to update profile:', error);

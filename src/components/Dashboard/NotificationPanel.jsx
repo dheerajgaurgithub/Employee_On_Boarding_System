@@ -56,7 +56,7 @@ const NotificationPanel = () => {
               
               return (
                 <div 
-                  key={notification.id} 
+                  key={notification._id} 
                   className={`border rounded-lg p-4 transition-all ${
                     notification.read 
                       ? 'border-gray-200 bg-white' 
@@ -90,7 +90,7 @@ const NotificationPanel = () => {
                         
                         {!notification.read && (
                           <button
-                            onClick={() => handleMarkRead(notification.id)}
+                            onClick={() => handleMarkRead(notification._id)}
                             className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                           >
                             Mark as read

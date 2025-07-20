@@ -27,6 +27,10 @@ const meetingSchema = new mongoose.Schema({
     type: Number,
     default: 60
   },
+  googleMeetLink: {
+    type: String,
+    trim: true
+  },
   status: {
     type: String,
     enum: ['scheduled', 'completed', 'cancelled'],

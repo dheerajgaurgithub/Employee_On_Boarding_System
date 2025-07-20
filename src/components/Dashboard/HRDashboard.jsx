@@ -28,7 +28,22 @@ const HRDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { currentUser, logout } = useAuth();
   const { getNotificationsByUser } = useData();
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatTarget, setChatTarget] = useState(null);
+  const { getUsersByRole } = useAuth();
+  const employeeUsers = getUsersByRole('employee');
+  const adminUsers = getUsersByRole('admin');
 
+  // Auto-select first employee or admin as chat target when opening chat tab
+  React.useEffect(() => {
+    if (chatOpen && !chatTarget) {
+      if (employeeUsers.length > 0) {
+        setChatTarget(employeeUsers[0]);
+      } else if (adminUsers.length > 0) {
+        setChatTarget(adminUsers[0]);
+      }
+    }
+  }, [chatOpen, chatTarget, employeeUsers, adminUsers]);
   const notifications = getNotificationsByUser(currentUser.id);
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -45,6 +60,11 @@ const HRDashboard = () => {
     { id: 'profile', label: 'Profile', icon: Settings }
   ];
 
+  const handleMessageEmployee = (employee) => {
+    setChatTarget(employee);
+    setChatOpen(true);
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
@@ -52,7 +72,7 @@ const HRDashboard = () => {
       case 'add-employee':
         return <AddEmployeeForm />;
       case 'employees':
-        return <EmployeeList />;
+        return <EmployeeList onChat={handleMessageEmployee} />;
       case 'tasks':
         return <TaskManagement role="hr" />;
       case 'attendance':
@@ -124,7 +144,12 @@ const HRDashboard = () => {
                   return (
                     <li key={tab.id}>
                       <button
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={() => {
+                          setActiveTab(tab.id);
+                          if (tab.id === 'chat') {
+                            setChatOpen(true);
+                          }
+                        }}
                         className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
                           activeTab === tab.id
                             ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500'
@@ -148,7 +173,14 @@ const HRDashboard = () => {
 
           {/* Main Content */}
           <div className="flex-1">
-            {renderTabContent()}
+            {activeTab !== 'chat' && renderTabContent()}
+            {activeTab === 'chat' && chatOpen && (
+              <ChatSystem
+                chatRole="hr"
+                initialTarget={chatTarget}
+                onClose={() => setChatOpen(false)}
+              />
+            )}
           </div>
         </div>
       </div>
