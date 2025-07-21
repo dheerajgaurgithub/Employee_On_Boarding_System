@@ -322,13 +322,21 @@ const TaskManagement = ({ role }) => {
                         <div className="flex items-center space-x-1">
                           <User className="w-4 h-4" />
                           <span>
-                            {role === 'employee' ? `Assigned by: ${assigner?.name}` : `Assigned to: ${assignedUser?.name}`}
+                            {role === 'employee' ? `Assigned by: ${assigner?.name}` : (() => {
+                              if (!task.assignedTo) return "Assigned to: Unassigned";
+                              if (typeof task.assignedTo === "object" && task.assignedTo.name) return `Assigned to: ${task.assignedTo.name}`;
+                              if (typeof task.assignedTo === "string" && getUserById) {
+                                const user = getUserById(task.assignedTo);
+                                return user ? `Assigned to: ${user.name}` : "Assigned to: Unknown";
+                              }
+                              return "Assigned to: Unknown";
+                            })()}
                           </span>
                         </div>
                         {task.dueDate && (
                           <div className="flex items-center space-x-1">
                             <Calendar className="w-4 h-4" />
-                            <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                            <span>Due: {formatDate(task.dueDate)}</span>
                           </div>
                         )}
                         <div className="flex items-center text-gray-500 mt-4">
