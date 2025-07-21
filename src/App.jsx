@@ -5,6 +5,7 @@ import Login from './components/Login';
 import AdminDashboard from './components/Dashboard/AdminDashboard';
 import HRDashboard from './components/Dashboard/HRDashboard';
 import EmployeeDashboard from './components/Dashboard/EmployeeDashboard';
+import LandingPage from './components/LandingPage';
 
 const AppContent = () => {
   const { currentUser, loading } = useAuth();
@@ -19,13 +20,10 @@ const AppContent = () => {
       </div>
     );
   }
-
-  // If no user is logged in, go directly to Login
   if (!currentUser) {
-    return <Login />;
+    return <LandingPage />;
   }
 
-  // Role-based dashboard routing
   switch (currentUser.role) {
     case 'admin':
       return <AdminDashboard />;
