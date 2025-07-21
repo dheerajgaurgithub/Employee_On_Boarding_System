@@ -45,24 +45,24 @@ const NotificationPanel = () => {
       </div>
     </div>
 
-    <div className="p-8">
+    <div className="p-8 sm:p-4">
       {notifications.length === 0 ? (
-        <div className="text-center py-16">
+        <div className="text-center py-16 sm:py-8">
           <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-              <Bell className="w-10 h-10 text-blue-500" />
+            <div className="w-20 h-20 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+              <Bell className="w-10 h-10 sm:w-7 sm:h-7 text-blue-500" />
             </div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-              <div className="w-2 h-2 bg-white rounded-full"></div>
+            <div className="absolute -top-2 -right-2 w-6 h-6 sm:w-4 sm:h-4 bg-green-500 rounded-full flex items-center justify-center">
+              <div className="w-2 h-2 sm:w-1.5 sm:h-1.5 bg-white rounded-full"></div>
             </div>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-3">All Caught Up!</h3>
-          <p className="text-gray-500 text-lg max-w-md mx-auto leading-relaxed">
+          <h3 className="text-xl sm:text-lg font-bold text-gray-900 mb-3">All Caught Up!</h3>
+          <p className="text-gray-500 text-lg sm:text-base max-w-md mx-auto leading-relaxed">
             No new notifications right now. We'll let you know when something important happens.
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6 sm:space-y-4">
           {notifications.map((notification) => {
             const Icon = getNotificationIcon(notification.type);
             const iconColor = getNotificationColor(notification.type);
@@ -70,7 +70,7 @@ const NotificationPanel = () => {
             return (
               <div 
                 key={notification._id} 
-                className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] ${
+                className={`group relative overflow-hidden rounded-2xl p-6 sm:p-4 transition-all duration-300 hover:scale-[1.02] ${
                   notification.read 
                     ? 'border-2 border-gray-100 bg-white hover:shadow-lg' 
                     : 'border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 hover:shadow-xl shadow-md'
