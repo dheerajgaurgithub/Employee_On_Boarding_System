@@ -16,50 +16,62 @@ const messageRoutes = require('./routes/messages');
 
 const app = express();
 const server = http.createServer(app);
+
+// 🔧 Fix CORS for Socket.IO
 const io = socketIo(server, {
   cors: {
-    origin: "https://employee-on-boarding-system.vercel.app/",
-    methods: ["GET", "POST"]
+    origin: [
+      "http://localhost:5173",
+      "https://employee-on-boarding-system.vercel.app"
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
-// Middleware
-app.use(cors());
+// 🌐 Enable CORS for API routes
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://employee-on-boarding-system.vercel.app"
+  ],
+  credentials: true
+}));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
-// MongoDB Connection
+// 📦 MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://dheerajgaurcs23:dheerajgaurcs23@cluster0.9gslzuz.mongodb.net/', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.log('MongoDB connection error:', err));
+.then(() => console.log('✅ MongoDB connected'))
+.catch(err => console.log('❌ MongoDB connection error:', err));
 
-// Socket.IO for real-time features
+// ⚡ Socket.IO for real-time messaging
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-  
+  console.log('⚡ User connected:', socket.id);
+
   socket.on('join_room', (userId) => {
     socket.join(userId);
   });
-  
+
   socket.on('send_message', (data) => {
     socket.to(data.receiverId).emit('receive_message', data);
   });
-  
+
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+    console.log('🔌 User disconnected:', socket.id);
   });
 });
 
-// Make io available to routes
+// 🌍 Make io available in routes via req.io
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
-// Routes
+// 🛣️ Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
@@ -69,12 +81,13 @@ app.use('/api/meetings', meetingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/messages', messageRoutes);
 
-// Default root route to avoid "Cannot GET /"
+// 🔗 Root route
 app.get('/', (req, res) => {
   res.send('✅ Employee Onboarding System Backend is Running!');
 });
 
+// 🚀 Start server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
