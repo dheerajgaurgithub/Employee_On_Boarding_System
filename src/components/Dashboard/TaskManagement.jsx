@@ -31,7 +31,9 @@ const TaskManagement = ({ role }) => {
 
   const myTasks = role === 'employee'
     ? getTasksByUser(currentUser._id)
-    : getTasksByAssigner(currentUser._id);
+    : role === 'hr'
+      ? getTasksByUser(currentUser._id)
+      : getTasksByAssigner(currentUser._id);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
