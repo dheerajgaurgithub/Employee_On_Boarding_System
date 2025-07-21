@@ -1,197 +1,30 @@
-import React, { useState, useEffect } from "react";
-import { Users, Calendar, MessageCircle, BarChart3, Shield, Rocket } from "lucide-react";
+import React from "react";
 
-const LandingPage = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  const features = [
-    { icon: Users, title: "Employee Management", desc: "Complete employee lifecycle management" },
-    { icon: Calendar, title: "Smart Scheduling", desc: "Attendance, leaves & meeting coordination" },
-    { icon: MessageCircle, title: "Real-time Communication", desc: "Instant messaging with Socket.IO" },
-    { icon: BarChart3, title: "Analytics Dashboard", desc: "Insights and performance tracking" },
-    { icon: Shield, title: "Role-based Access", desc: "Secure HR, Admin & Employee portals" },
-    { icon: Rocket, title: "Streamlined Onboarding", desc: "Automated new hire processes" }
-  ];
-
-  return (
-    <div className="min-h-screen bg-slate-900 text-white overflow-hidden relative">
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/25 via-teal-900/20 to-orange-900/25"></div>
-      
-      {/* Floating orbs */}
-      <div 
-        className="absolute w-96 h-96 bg-gradient-to-r from-emerald-500/30 to-teal-500/30 rounded-full blur-3xl animate-pulse"
-        style={{
-          left: `${mousePosition.x * 0.02}px`,
-          top: `${mousePosition.y * 0.02}px`,
-          transform: `translate(-50%, -50%) translateY(${scrollY * -0.1}px)`
-        }}
-      ></div>
-      
-      <div 
-        className="absolute w-80 h-80 bg-gradient-to-r from-orange-500/25 to-amber-500/25 rounded-full blur-3xl animate-pulse"
-        style={{
-          right: `${mousePosition.x * -0.01}px`,
-          bottom: `${mousePosition.y * -0.01}px`,
-          transform: `translate(50%, 50%) translateY(${scrollY * -0.15}px)`,
-          animationDelay: '1s'
-        }}
-      ></div>
-
-      {/* Main content */}
-      <div className="relative z-10 min-h-screen flex flex-col">
-        {/* Hero section */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-20">
-          <div className="text-center mb-12 max-w-5xl">
-            <div className="inline-block mb-6 px-6 py-2 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-full border border-emerald-500/30 backdrop-blur-sm">
-              <span className="text-emerald-300 text-sm font-medium">Next-Gen Workforce Management</span>
-            </div>
-            
-            <h1 className="text-7xl md:text-8xl font-black mb-8 leading-tight">
-              <span className="bg-gradient-to-r from-white via-emerald-200 to-teal-200 bg-clip-text text-transparent">
-                Employee
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-orange-400 bg-clip-text text-transparent animate-pulse">
-                Onboarding
-              </span>
-              <br />
-              <span className="text-white/90">& Management</span>
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-gray-300 mb-12 leading-relaxed max-w-4xl mx-auto">
-              Revolutionary platform that transforms HR operations with intelligent automation, 
-              real-time collaboration, and seamless employee experiences. Built for the future of work.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6 items-center justify-center mb-16">
-              <a 
-                href="/login" 
-                className="group relative px-12 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-full font-bold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/25 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <span className="relative z-10">Launch Platform</span>
-              </a>
-              
-              <a 
-                href="https://employee-on-boarding-system.onrender.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="px-12 py-4 border border-orange-400/40 rounded-full font-semibold text-lg hover:bg-orange-500/10 hover:border-orange-400/60 transition-all duration-300 backdrop-blur-sm text-orange-300 hover:text-orange-200"
-              >
-                Explore API
-              </a>
-            </div>
-          </div>
-
-          {/* Features grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl w-full">
-            {features.map((feature, index) => (
-              <div 
-                key={index}
-                className="group p-8 bg-white/5 backdrop-blur-sm rounded-2xl border border-emerald-500/20 hover:bg-white/10 hover:border-emerald-500/30 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/10"
-                style={{
-                  animationDelay: `${index * 0.1}s`
-                }}
-              >
-                <div className="mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-emerald-500/20">
-                    <feature.icon className="w-8 h-8 text-emerald-400 group-hover:text-white transition-colors duration-300" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-white group-hover:text-emerald-200 transition-colors duration-300">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-400 leading-relaxed">
-                  {feature.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Tech stack section */}
-        <div className="py-20 px-6">
-          <div className="max-w-7xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-8 text-white/90">Powered by Modern Technology</h2>
-            <div className="flex flex-wrap items-center justify-center gap-8 text-gray-400">
-              {['React', 'Node.js', 'Express', 'MongoDB', 'Socket.IO'].map((tech, index) => (
-                <div 
-                  key={tech}
-                  className="px-6 py-3 bg-emerald-500/10 rounded-full border border-emerald-500/20 hover:bg-emerald-500/20 hover:border-emerald-500/40 hover:text-emerald-300 transition-all duration-300 hover:scale-105"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  {tech}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Developer section */}
-        <div className="py-20 px-6 bg-gradient-to-r from-emerald-500/5 to-orange-500/5 backdrop-blur-sm">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-block mb-8 px-6 py-2 bg-gradient-to-r from-orange-500/20 to-amber-500/20 rounded-full border border-orange-500/30">
-              <span className="text-orange-300 text-sm font-medium">Meet the Developer</span>
-            </div>
-            
-            <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-white to-orange-200 bg-clip-text text-transparent">
-              Dheeraj Gaur
-            </h2>
-            <p className="text-xl text-orange-300 mb-8">Full Stack Developer</p>
-            <p className="text-gray-400 text-lg leading-relaxed mb-8 max-w-3xl mx-auto">
-              Passionate about building scalable web applications and delivering robust solutions 
-              for real-world problems. Transforming ideas into powerful digital experiences.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-6 items-center justify-center">
-              <a 
-                href="mailto:dheerajgaur.0fficial@gmail.com"
-                className="px-8 py-3 bg-gradient-to-r from-orange-600/20 to-amber-600/20 rounded-full border border-orange-500/30 hover:bg-gradient-to-r hover:from-orange-600/30 hover:to-amber-600/30 transition-all duration-300 backdrop-blur-sm text-orange-200 hover:text-white"
-              >
-                Contact Developer
-              </a>
-              <a 
-                href="https://dheerajgaurofficial.netlify.app/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-emerald-400 hover:text-emerald-300 transition-colors duration-300 underline decoration-emerald-400/50 hover:decoration-emerald-300"
-              >
-                View Portfolio →
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <footer className="py-8 text-center border-t border-emerald-500/20">
-          <p className="text-gray-500">
-            &copy; {new Date().getFullYear()} Dheeraj Gaur. All rights reserved.
-          </p>
-        </footer>
+const LandingPage = () => (
+  <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-6">
+    <div className="max-w-2xl w-full bg-white rounded-xl shadow-lg p-8">
+      <h1 className="text-4xl font-bold text-blue-700 mb-4 text-center">Employee Onboarding & Management System</h1>
+      <p className="text-lg text-gray-700 mb-6 text-center">
+        This project streamlines the onboarding process, manages employee data, tasks, attendance, leaves, meetings, and real-time communication for HR, Admin, and Employees. Built with React, Node.js, Express, MongoDB, and Socket.IO.
+      </p>
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-2">About the Developer</h2>
+        <p className="text-gray-700 mb-1">Name: <span className="font-medium">Dheeraj Kumar</span></p>
+        <p className="text-gray-700 mb-1">Role: Full Stack Developer</p>
+        <p className="text-gray-700 mb-1">Email: dheerajgaur.0fficial@gmail.com</p>
+        <p className="text-gray-700">Passionate about building scalable web applications and delivering robust solutions for real-world problems.</p>
+        <link rel="stylesheet" href="https://dheerajgaurofficial.netlify.app/" />
+      </div>
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">Backend API</h2>
+        <a href="https://employee-on-boarding-system.onrender.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://employee-on-boarding-system.onrender.com</a>
+      </div>
+      <div className="flex flex-col items-center">
+        <a href="http://localhost:5173/login" className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition">Get Started</a>
       </div>
     </div>
-  );
-};
+    <footer className="mt-8 text-gray-500 text-sm">&copy; {new Date().getFullYear()} Dheeraj Gaur. All rights reserved.</footer>
+  </div>
+);
 
 export default LandingPage;
