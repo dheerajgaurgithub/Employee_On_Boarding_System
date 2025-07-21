@@ -133,11 +133,11 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
           {/* Sidebar */}
-          <div className="lg:w-72">
-            <nav className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-6 sticky top-24">
+          <div className="lg:w-72 w-full mb-4 lg:mb-0">
+            <nav className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-4 sm:p-6 sticky top-24">
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-800 mb-2">Navigation</h2>
                 <div className="w-12 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"></div>
@@ -186,9 +186,9 @@ const AdminDashboard = () => {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 min-h-96 overflow-hidden">
-              <div className="p-8">
+              <div className="p-4 sm:p-8">
                 {renderTabContent()}
               </div>
             </div>

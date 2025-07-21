@@ -70,14 +70,14 @@ const AddEmployeeForm = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-2xl p-8 border border-slate-200">
-      <div className="flex items-center space-x-4 mb-8">
+    <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-2xl p-4 sm:p-8 border border-slate-200">
+      <div className="flex flex-col sm:flex-row items-center sm:space-x-4 mb-8 space-y-4 sm:space-y-0">
         <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-lg">
           <UserPlus className="w-8 h-8 text-white" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold text-slate-800">Add New Employee</h2>
-          <p className="text-slate-600 mt-1">Create a new employee profile with auto-generated credentials</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-800">Add New Employee</h2>
+          <p className="text-slate-600 mt-1 text-sm sm:text-base">Create a new employee profile with auto-generated credentials</p>
         </div>
       </div>
 
@@ -120,7 +120,7 @@ const AddEmployeeForm = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
           <div className="space-y-2">
             <label className="block text-sm font-bold text-slate-700 mb-2 flex items-center">
               <div className="w-2 h-4 bg-blue-500 rounded-full mr-2"></div>

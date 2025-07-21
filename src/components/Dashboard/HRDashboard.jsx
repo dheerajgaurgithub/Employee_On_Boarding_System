@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import DashboardStats from './DashboardStats';
@@ -11,31 +11,37 @@ import AttendanceTracker from './AttendanceTracker';
 import ChatSystem from './ChatSystem';
 import ProfileSettings from './ProfileSettings';
 import NotificationPanel from './NotificationPanel';
-import { 
-  Users, 
-  UserPlus, 
-  CheckSquare, 
-  Calendar, 
-  FileText, 
+import {
+  Users,
+  UserPlus,
+  CheckSquare,
+  Calendar,
+  FileText,
   Clock,
   MessageCircle,
   Settings,
   Bell,
-  LogOut
+  LogOut,
 } from 'lucide-react';
 
 const HRDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const { currentUser, logout } = useAuth();
-  const { getNotificationsByUser } = useData();
   const [chatOpen, setChatOpen] = useState(false);
   const [chatTarget, setChatTarget] = useState(null);
-  const { getUsersByRole } = useAuth();
-  const employeeUsers = getUsersByRole('employee');
-  const adminUsers = getUsersByRole('admin');
+  const [employeeUsers, setEmployeeUsers] = useState([]);
+  const [adminUsers, setAdminUsers] = useState([]);
 
-  // Auto-select first employee or admin as chat target when opening chat tab
-  React.useEffect(() => {
+  const { currentUser, logout, getUsersByRole } = useAuth();
+  const { getNotificationsByUser } = useData();
+
+  // Fetch employee and admin users once
+  useEffect(() => {
+    setEmployeeUsers(getUsersByRole('employee'));
+    setAdminUsers(getUsersByRole('admin'));
+  }, [getUsersByRole]);
+
+  // Auto-select first employee/admin as chat target
+  useEffect(() => {
     if (chatOpen && !chatTarget) {
       if (employeeUsers.length > 0) {
         setChatTarget(employeeUsers[0]);
@@ -44,8 +50,17 @@ const HRDashboard = () => {
       }
     }
   }, [chatOpen, chatTarget, employeeUsers, adminUsers]);
-  const notifications = getNotificationsByUser(currentUser.id);
-  const unreadCount = notifications.filter(n => !n.read).length;
+
+  if (!currentUser) return <div className="p-10 text-center">Loading...</div>;
+
+  const notifications = getNotificationsByUser(currentUser.id) || [];
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const handleMessageEmployee = (employee) => {
+    setChatTarget(employee);
+    setChatOpen(true);
+    setActiveTab('chat');
+  };
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Users },
@@ -57,13 +72,8 @@ const HRDashboard = () => {
     { id: 'leaves', label: 'Leave Requests', icon: FileText },
     { id: 'chat', label: 'Chat', icon: MessageCircle },
     { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'profile', label: 'Profile', icon: Settings }
+    { id: 'profile', label: 'Profile', icon: Settings },
   ];
-
-  const handleMessageEmployee = (employee) => {
-    setChatTarget(employee);
-    setChatOpen(true);
-  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -81,8 +91,6 @@ const HRDashboard = () => {
         return <MeetingScheduler role="hr" />;
       case 'leaves':
         return <LeaveManagement role="hr" />;
-      case 'chat':
-        return <ChatSystem />;
       case 'notifications':
         return <NotificationPanel />;
       case 'profile':
@@ -111,7 +119,7 @@ const HRDashboard = () => {
                 <p className="text-slate-600 text-sm">Manage your workforce efficiently</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-6">
               <button
                 onClick={() => setActiveTab('notifications')}
@@ -124,22 +132,22 @@ const HRDashboard = () => {
                   </span>
                 )}
               </button>
-              
+
               <div className="flex items-center space-x-4 bg-slate-100 rounded-xl px-4 py-2 shadow-md hover:shadow-lg transition-shadow duration-200">
                 <div className="relative">
                   <img
-                    src={currentUser.profilePicture}
-                    alt={currentUser.name}
+                    src={currentUser.profilePicture || '/default-avatar.png'}
+                    alt={currentUser.name || 'User Avatar'}
                     className="w-10 h-10 rounded-full border-2 border-white shadow-md"
                   />
                   <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
                 </div>
                 <div>
-                  <span className="text-sm font-bold text-slate-800">{currentUser.name}</span>
+                  <span className="text-sm font-bold text-slate-800">{currentUser.name || 'User'}</span>
                   <p className="text-xs text-slate-600">HR Manager</p>
                 </div>
               </div>
-              
+
               <button
                 onClick={logout}
                 className="flex items-center space-x-3 px-4 py-3 bg-slate-100 hover:bg-red-100 rounded-xl transition-all duration-200 hover:scale-105 group"
@@ -152,16 +160,17 @@ const HRDashboard = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
           {/* Sidebar */}
-          <div className="lg:w-72">
-            <nav className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-slate-200">
+          <div className="lg:w-72 w-full mb-4 lg:mb-0">
+            <nav className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-4 sm:p-6 border border-slate-200">
               <div className="mb-6">
                 <h2 className="text-lg font-bold text-slate-800 mb-2">Navigation</h2>
                 <div className="w-12 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"></div>
               </div>
-              
+
               <ul className="space-y-3">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
@@ -180,16 +189,20 @@ const HRDashboard = () => {
                             : 'text-slate-700 hover:bg-slate-100 hover:scale-102'
                         }`}
                       >
-                        <div className={`p-2 rounded-lg ${
-                          activeTab === tab.id 
-                            ? 'bg-white/20' 
-                            : 'bg-slate-200 group-hover:bg-blue-100'
-                        }`}>
-                          <Icon className={`w-5 h-5 ${
-                            activeTab === tab.id 
-                              ? 'text-white' 
-                              : 'text-slate-600 group-hover:text-blue-600'
-                          }`} />
+                        <div
+                          className={`p-2 rounded-lg ${
+                            activeTab === tab.id
+                              ? 'bg-white/20'
+                              : 'bg-slate-200 group-hover:bg-blue-100'
+                          }`}
+                        >
+                          <Icon
+                            className={`w-5 h-5 ${
+                              activeTab === tab.id
+                                ? 'text-white'
+                                : 'text-slate-600 group-hover:text-blue-600'
+                            }`}
+                          />
                         </div>
                         <span className="font-semibold">{tab.label}</span>
                         {tab.id === 'notifications' && unreadCount > 0 && (
@@ -206,15 +219,11 @@ const HRDashboard = () => {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1">
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200 min-h-[600px]">
-              {activeTab !== 'chat' && (
-                <div className="p-8">
-                  {renderTabContent()}
-                </div>
-              )}
+          <div className="flex-1 w-full">
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl min-h-96 p-4 sm:p-8 border border-slate-200">
+              {renderTabContent()}
               {activeTab === 'chat' && chatOpen && (
-                <div className="p-6">
+                <div className="mt-6">
                   <ChatSystem
                     chatRole="hr"
                     initialTarget={chatTarget}

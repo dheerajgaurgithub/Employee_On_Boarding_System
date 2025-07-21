@@ -84,8 +84,8 @@ const Login = () => {
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center min-h-screen py-12">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20 items-center min-h-screen py-8 md:py-12">
           
           {/* Left side - Branding & Info */}
           <div className="text-center lg:text-left order-2 lg:order-1">
@@ -159,7 +159,7 @@ const Login = () => {
           <div className="order-1 lg:order-2">
             <div className="w-full max-w-md mx-auto">
               {/* Login card */}
-              <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-8 sm:p-10 shadow-2xl">
+              <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 p-4 sm:p-8 md:p-10 shadow-2xl">
                 <div className="text-center mb-8">
                   <div className="mx-auto w-16 h-16 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center mb-6 border border-white/20">
                     <User className="w-8 h-8 text-white" />

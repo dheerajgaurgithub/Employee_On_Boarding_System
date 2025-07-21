@@ -44,23 +44,23 @@ const HRList = ({ onMessageHR }) => {
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/50 overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 p-8 border-b border-gray-100">
-        <div className="flex items-center space-x-4">
+      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 p-4 sm:p-8 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row items-center sm:space-x-4 space-y-4 sm:space-y-0">
           <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl shadow-lg">
             <Users className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-900 bg-clip-text text-transparent">
+            <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-900 bg-clip-text text-transparent">
               HR Management
             </h2>
-            <p className="text-gray-600 font-medium mt-1">Manage HR profiles, salaries, and view their status</p>
+            <p className="text-gray-600 font-medium mt-1 text-sm sm:text-base">Manage HR profiles, salaries, and view their status</p>
           </div>
         </div>
       </div>
 
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         {hrUsers.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="text-center py-8 sm:py-16">
             <div className="relative">
               <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full mx-auto mb-6 flex items-center justify-center">
                 <Users className="w-12 h-12 text-gray-400" />
@@ -71,7 +71,7 @@ const HRList = ({ onMessageHR }) => {
             <p className="text-gray-600 text-lg">Add your first HR member to get started with team management.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
             {hrUsers.map((hr) => {
               const assignedTasks = getTasksByAssigner(hr._id);
               const leaveRequests = getLeavesByApprover(hr._id);

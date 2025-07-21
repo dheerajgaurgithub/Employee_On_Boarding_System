@@ -72,21 +72,21 @@ const AddHRForm = () => {
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/50 overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 p-8 border-b border-gray-100">
-        <div className="flex items-center space-x-4">
+      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 p-4 sm:p-8 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row items-center sm:space-x-4 space-y-4 sm:space-y-0">
           <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl shadow-lg">
             <UserPlus className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-900 bg-clip-text text-transparent">
+            <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-900 bg-clip-text text-transparent">
               Add New HR
             </h2>
-            <p className="text-gray-600 font-medium">Create a new HR account with auto-generated credentials</p>
+            <p className="text-gray-600 font-medium text-sm sm:text-base">Create a new HR account with auto-generated credentials</p>
           </div>
         </div>
       </div>
 
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-2xl shadow-sm">
@@ -143,7 +143,7 @@ const AddHRForm = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {/* Full Name */}
             <div className="group">
               <label className="block text-sm font-bold text-gray-700 mb-3">
