@@ -121,199 +121,257 @@ const LeaveManagement = ({ role }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <FileText className="w-6 h-6 text-blue-600" />
-            <h2 className="text-2xl font-bold text-gray-900">
+  <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+    {/* Header Section */}
+    <div className="p-8 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b border-gray-100">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+            <FileText className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
               {role === 'employee' ? 'My Leave Requests' : 'Leave Management'}
             </h2>
+            <p className="text-gray-600 mt-1">
+              {role === 'employee' ? 'Track your leave applications' : 'Review and manage employee leave requests'}
+            </p>
           </div>
-          {(role === 'employee' || role === 'hr') && (
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Apply for Leave</span>
-            </button>
-          )}
         </div>
+        {(role === 'employee' || role === 'hr') && (
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center space-x-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="font-semibold">Apply for Leave</span>
+          </button>
+        )}
       </div>
+    </div>
 
-      <div className="p-6">
-        {showAddForm && (
-          <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
-            <h3 className="text-lg font-semibold mb-4">Apply for Leave</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Date *
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) =>
-                      setFormData({ ...formData, startDate: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    End Date *
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) =>
-                      setFormData({ ...formData, endDate: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
+    <div className="p-8">
+      {/* Add Leave Form */}
+      {showAddForm && (
+        <div className="mb-8 p-6 border-2 border-blue-200 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg">
+              <Plus className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800">Apply for Leave</h3>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Reason *
+                <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">
+                  Start Date *
                 </label>
-                <textarea
-                  value={formData.reason}
+                <input
+                  type="date"
+                  value={formData.startDate}
                   onChange={(e) =>
-                    setFormData({ ...formData, reason: e.target.value })
+                    setFormData({ ...formData, startDate: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  rows="3"
-                  placeholder="Enter reason for leave"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
                   required
                 />
               </div>
-              <div className="flex space-x-3">
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Submit Request
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowAddForm(false)}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">
+                  End Date *
+                </label>
+                <input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, endDate: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm"
+                  required
+                />
               </div>
-            </form>
-          </div>
-        )}
+            </div>
+            
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">
+                Reason *
+              </label>
+              <textarea
+                value={formData.reason}
+                onChange={(e) =>
+                  setFormData({ ...formData, reason: e.target.value })
+                }
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm resize-none"
+                rows="4"
+                placeholder="Please provide a detailed reason for your leave request..."
+                required
+              />
+            </div>
+            
+            <div className="flex space-x-4 pt-4">
+              <button
+                type="submit"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+              >
+                Submit Request
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAddForm(false)}
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:from-gray-500 hover:to-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
-        {myLeaves.length === 0 ? (
-          <div className="text-center py-8">
-            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Leave Requests</h3>
-            <p className="text-gray-600">
-              {role === 'employee'
-                ? 'You have no leave requests yet.'
-                : 'No leave requests to review.'}
-            </p>
+      {/* Empty State */}
+      {myLeaves.length === 0 ? (
+        <div className="text-center py-16">
+          <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+            <FileText className="w-12 h-12 text-gray-400" />
           </div>
-        ) : (
-          <div className="space-y-4">
-            {myLeaves.map((leave) => {
-              const applicant = getUserById(leave.employeeId);
+          <h3 className="text-2xl font-bold text-gray-800 mb-3">No Leave Requests</h3>
+          <p className="text-gray-500 text-lg max-w-md mx-auto">
+            {role === 'employee'
+              ? 'You haven\'t submitted any leave requests yet. Click the button above to apply for your first leave.'
+              : 'No leave requests pending for review. All caught up!'}
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {myLeaves.map((leave) => {
+            const applicant = getUserById(leave.employeeId);
 
-              return (
-                <div
-                  key={leave._id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
+            return (
+              <div
+                key={leave._id}
+                className="group border-2 border-gray-200 rounded-2xl p-6 hover:shadow-2xl hover:border-blue-300 transition-all duration-300 transform hover:-translate-y-1 bg-white"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    {/* Leave Header */}
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg">
+                          <Calendar className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
                           {role === 'employee'
                             ? 'Leave Request'
                             : `${leave.employeeName}'s Leave`}
                         </h3>
-                        <span
-                          className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                            leave.status
-                          )} ${["approved","rejected"].includes(leave.status) ? "font-bold italic" : ""}`}
-                        >
-                          {leave.status.toUpperCase()}
-                        </span>
                       </div>
+                      <span
+                        className={`px-4 py-2 text-sm font-bold rounded-xl shadow-lg ${getStatusColor(
+                          leave.status
+                        )} ${["approved","rejected"].includes(leave.status) ? "animate-pulse" : ""}`}
+                      >
+                        {leave.status.toUpperCase()}
+                      </span>
+                    </div>
 
-                      <p className="text-gray-600 mb-3">{leave.reason}</p>
+                    {/* Reason */}
+                    <div className="mb-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-100">
+                      <p className="text-gray-700 font-medium text-lg leading-relaxed">{leave.reason}</p>
+                    </div>
 
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        {role !== 'employee' && (
-                          <div className="flex items-center space-x-1">
-                            <User className="w-4 h-4" />
-                            <span>Applicant: {leave.employeeName}</span>
+                    {/* Details */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      {role !== 'employee' && (
+                        <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-xl border border-purple-100">
+                          <div className="p-2 bg-white rounded-lg shadow-sm">
+                            <User className="w-4 h-4 text-purple-600" />
                           </div>
-                        )}
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>
-                            {new Date(leave.startDate).toLocaleDateString()} -{' '}
-                            {new Date(leave.endDate).toLocaleDateString()}
-                          </span>
+                          <div>
+                            <span className="text-gray-500 font-medium">Applicant</span>
+                            <p className="text-gray-800 font-bold">{leave.employeeName}</p>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <Clock className="w-4 h-4" />
-                          <span>
-                            Applied: {new Date(leave.createdAt).toLocaleDateString()}
-                          </span>
+                      )}
+                      
+                      <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-xl border border-green-100">
+                        <div className="p-2 bg-white rounded-lg shadow-sm">
+                          <Calendar className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div>
+                          <span className="text-gray-500 font-medium">Duration</span>
+                          <p className="text-gray-800 font-bold">
+                            {new Date(leave.startDate).toLocaleDateString()} - {new Date(leave.endDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
+                        <div className="p-2 bg-white rounded-lg shadow-sm">
+                          <Clock className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <span className="text-gray-500 font-medium">Applied</span>
+                          <p className="text-gray-800 font-bold">
+                            {new Date(leave.createdAt).toLocaleDateString()}
+                          </p>
                         </div>
                       </div>
                     </div>
-
-                    {role !== 'employee' && leave.status === 'pending' && (
-                      <div className="flex space-x-2 ml-4">
-                        <button
-                          onClick={() => handleLeaveAction(leave._id, 'approved')}
-                          className="flex items-center space-x-1 px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200"
-                        >
-                          <Check className="w-4 h-4" />
-                          <span>Approve</span>
-                        </button>
-                        <button
-                          onClick={() => handleLeaveAction(leave._id, 'rejected')}
-                          className="flex items-center space-x-1 px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
-                        >
-                          <X className="w-4 h-4" />
-                          <span>Reject</span>
-                        </button>
-                      </div>
-                    )}
                   </div>
 
-                  {leave.respondedAt && (
-                    <div className="mt-3 pt-3 border-t border-gray-200 text-sm text-gray-600">
-                      <span className="font-bold italic">
-                        {leave.status === "approved"
-                          ? "Your leave request has been approved. "
-                          : leave.status === "rejected"
-                          ? "Your leave request has been rejected. "
-                          : ""}
-                      </span>
-                      Response given on{' '}
-                      {new Date(leave.respondedAt).toLocaleDateString()}
+                  {/* Action Buttons */}
+                  {role !== 'employee' && leave.status === 'pending' && (
+                    <div className="flex space-x-3 ml-6">
+                      <button
+                        onClick={() => handleLeaveAction(leave._id, 'approved')}
+                        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <Check className="w-5 h-5" />
+                        <span className="font-semibold">Approve</span>
+                      </button>
+                      <button
+                        onClick={() => handleLeaveAction(leave._id, 'rejected')}
+                        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <X className="w-5 h-5" />
+                        <span className="font-semibold">Reject</span>
+                      </button>
                     </div>
                   )}
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+
+                {/* Response Section */}
+                {leave.respondedAt && (
+                  <div className="mt-6 pt-6 border-t-2 border-gray-100">
+                    <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-white rounded-lg shadow-sm">
+                          <Clock className="w-5 h-5 text-orange-600" />
+                        </div>
+                        <div>
+                          <p className="text-gray-700 font-bold text-lg">
+                            {leave.status === "approved"
+                              ? "🎉 Your leave request has been approved!"
+                              : leave.status === "rejected"
+                              ? "❌ Your leave request has been rejected."
+                              : ""}
+                          </p>
+                          <p className="text-gray-600 font-medium">
+                            Response given on {new Date(leave.respondedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default LeaveManagement;

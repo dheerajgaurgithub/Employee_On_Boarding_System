@@ -5,7 +5,7 @@ import { MessageCircle, Send, User, Circle } from 'lucide-react';
 import Message from './Message';
 import io from 'socket.io-client';
 
-const socket = io("http://localhost:5000");
+const socket = io("https://employee-on-boarding-system.onrender.com/");
 
 const ChatSystem = ({ chatRole = "hr", initialTarget = null, onClose }) => {
   const { currentUser, getUsersByRole } = useAuth();
@@ -96,47 +96,63 @@ const ChatSystem = ({ chatRole = "hr", initialTarget = null, onClose }) => {
   }, [messages]);
 
   return (
-    <div className="bg-white rounded-lg shadow h-96 flex relative">
+    <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-2xl h-96 flex relative border border-slate-200 overflow-hidden">
       {onClose && (
-        <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl font-bold">&times;</button>
+        <button 
+          onClick={onClose} 
+          className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-red-100 text-slate-500 hover:text-red-500 rounded-full transition-all duration-200 hover:scale-110 shadow-md"
+        >
+          ×
+        </button>
       )}
+      
       {/* Chat List */}
-      <div className="w-1/3 border-r border-gray-200">
-        <div className="p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">
+      <div className="w-1/3 border-r border-slate-300 bg-gradient-to-b from-slate-50 to-slate-100">
+        <div className="p-5 border-b border-slate-300 bg-gradient-to-r from-blue-600 to-indigo-600">
+          <h3 className="text-lg font-bold text-white flex items-center">
+            <div className="w-2 h-6 bg-white rounded-full mr-3 opacity-80"></div>
             {chatRole === "admin" ? "HR Members" : "Employees"}
           </h3>
         </div>
-        <div className="overflow-y-auto h-80">
+        <div className="overflow-y-auto h-80 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
           {chatTargets.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              <User className="w-8 h-8 mx-auto mb-2" />
-              <p>No {chatRole === "admin" ? "HR members" : "employees"} to chat with</p>
+            <div className="p-6 text-center text-slate-500">
+              <div className="p-4 bg-slate-200 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <User className="w-8 h-8 text-slate-400" />
+              </div>
+              <p className="font-medium">No {chatRole === "admin" ? "HR members" : "employees"} to chat with</p>
             </div>
           ) : (
             chatTargets.map((target) => (
               <button
                 key={target._id}
                 onClick={() => setSelectedChat(target)}
-                className={`w-full p-4 text-left hover:bg-gray-50 border-b border-gray-100 ${
-                  selectedChat?._id === target._id ? 'bg-blue-50' : ''
+                className={`w-full p-4 text-left hover:bg-blue-50 border-b border-slate-200 transition-all duration-200 hover:shadow-md hover:scale-[1.02] ${
+                  selectedChat?._id === target._id ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-l-blue-500 shadow-md' : ''
                 }`}
               >
-                <div className="flex items-center space-x-3">
-                  <img
-                    src={target.profilePicture}
-                    alt={target.name}
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <div>
-                    <div className="font-medium text-gray-900">{target.name}</div>
-                    <div className="flex items-center space-x-1">
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <img
+                      src={target.profilePicture}
+                      alt={target.name}
+                      className="w-10 h-10 rounded-full border-2 border-white shadow-md"
+                    />
+                    <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
+                      target.isOnline ? 'bg-green-400' : 'bg-slate-400'
+                    }`}></div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-slate-900 text-sm">{target.name}</div>
+                    <div className="flex items-center space-x-2">
                       <Circle
                         className={`w-2 h-2 ${
-                          target.isOnline ? 'text-green-500 fill-current' : 'text-gray-400'
+                          target.isOnline ? 'text-green-500 fill-current' : 'text-slate-400'
                         }`}
                       />
-                      <span className="text-xs text-gray-500">
+                      <span className={`text-xs font-medium ${
+                        target.isOnline ? 'text-green-600' : 'text-slate-500'
+                      }`}>
                         {target.isOnline ? 'Online' : 'Offline'}
                       </span>
                     </div>
@@ -149,27 +165,34 @@ const ChatSystem = ({ chatRole = "hr", initialTarget = null, onClose }) => {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-white">
         {selectedChat ? (
           <>
             {/* Chat Header */}
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center space-x-3">
-                <img
-                  src={selectedChat.profilePicture}
-                  alt={selectedChat.name}
-                  className="w-8 h-8 rounded-full"
-                />
+            <div className="p-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100 shadow-sm">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <img
+                    src={selectedChat.profilePicture}
+                    alt={selectedChat.name}
+                    className="w-12 h-12 rounded-full border-3 border-blue-200 shadow-md"
+                  />
+                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
+                    selectedChat.isOnline ? 'bg-green-400' : 'bg-slate-400'
+                  }`}></div>
+                </div>
                 <div>
-                  <div className="font-medium text-gray-900">{selectedChat.name}</div>
-                  <div className="flex items-center space-x-1">
+                  <div className="font-bold text-slate-900 text-lg">{selectedChat.name}</div>
+                  <div className="flex items-center space-x-2">
                     <Circle
                       className={`w-2 h-2 ${
-                        selectedChat.isOnline ? 'text-green-500 fill-current' : 'text-gray-400'
+                        selectedChat.isOnline ? 'text-green-500 fill-current' : 'text-slate-400'
                       }`}
                     />
-                    <span className="text-xs text-gray-500">
-                      {selectedChat.isOnline ? 'Online' : 'Offline'}
+                    <span className={`text-sm font-medium ${
+                      selectedChat.isOnline ? 'text-green-600' : 'text-slate-500'
+                    }`}>
+                      {selectedChat.isOnline ? 'Online now' : 'Offline'}
                     </span>
                   </div>
                 </div>
@@ -177,11 +200,14 @@ const ChatSystem = ({ chatRole = "hr", initialTarget = null, onClose }) => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-slate-50/30 to-blue-50/30 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
               {messages.length === 0 ? (
-                <div className="text-center text-gray-500 py-8">
-                  <MessageCircle className="w-8 h-8 mx-auto mb-2" />
-                  <p>No messages yet. Start the conversation!</p>
+                <div className="text-center text-slate-500 py-12">
+                  <div className="p-4 bg-slate-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-md">
+                    <MessageCircle className="w-10 h-10 text-slate-400" />
+                  </div>
+                  <p className="text-lg font-medium text-slate-600">No messages yet</p>
+                  <p className="text-sm text-slate-500 mt-1">Start the conversation!</p>
                 </div>
               ) : (
                 <>
@@ -198,18 +224,18 @@ const ChatSystem = ({ chatRole = "hr", initialTarget = null, onClose }) => {
             </div>
 
             {/* Message Input */}
-            <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200">
-              <div className="flex space-x-2">
+            <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-200 bg-gradient-to-r from-white to-slate-50">
+              <div className="flex space-x-3">
                 <input
                   type="text"
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="Type a message..."
+                  className="flex-1 px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md placeholder-slate-400"
+                  placeholder="Type your message..."
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center"
                 >
                   <Send className="w-5 h-5" />
                 </button>
@@ -217,10 +243,13 @@ const ChatSystem = ({ chatRole = "hr", initialTarget = null, onClose }) => {
             </form>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
+          <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
             <div className="text-center">
-              <MessageCircle className="w-12 h-12 mx-auto mb-4" />
-              <p>Select a user to start chatting</p>
+              <div className="p-6 bg-slate-100 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center shadow-lg">
+                <MessageCircle className="w-12 h-12 text-slate-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-700 mb-2">Ready to Chat?</h3>
+              <p className="text-slate-500 text-lg">Select a user to start chatting</p>
             </div>
           </div>
         )}

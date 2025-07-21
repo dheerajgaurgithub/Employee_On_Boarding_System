@@ -208,37 +208,45 @@ const DashboardStats = ({ role }) => {
 
   return (
     <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Welcome back, {currentUser.name}!
-        </h2>
-        <p className="text-gray-600">
-          Here's what's happening in your {role} dashboard today.
-        </p>
+      <div className="mb-8">
+        <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-6 border border-white/50 shadow-sm">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent mb-3">
+            Welcome back, {currentUser.name}! 👋
+          </h2>
+          <p className="text-gray-600 text-lg font-medium">
+            Here's what's happening in your <span className="text-blue-600 font-semibold">{role}</span> dashboard today.
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           const colorClasses = {
-            blue: 'bg-blue-500 text-blue-50',
-            green: 'bg-green-500 text-green-50',
-            purple: 'bg-purple-500 text-purple-50',
-            orange: 'bg-orange-500 text-orange-50',
-            indigo: 'bg-indigo-500 text-indigo-50',
-            emerald: 'bg-emerald-500 text-emerald-50'
+            blue: 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-blue-200',
+            green: 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-green-200',
+            purple: 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-purple-200',
+            orange: 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-orange-200',
+            indigo: 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-indigo-200',
+            emerald: 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-emerald-200'
           };
 
           return (
-            <div key={index} className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center">
-                <div className={`p-3 rounded-lg ${colorClasses[stat.color]}`}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                  <p className="text-sm text-gray-500">{stat.subtitle}</p>
+            <div 
+              key={index} 
+              className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-white/50 overflow-hidden"
+            >
+              <div className="p-6 relative">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-gray-50 to-gray-100 rounded-full -translate-y-10 translate-x-10 opacity-50 group-hover:opacity-70 transition-opacity"></div>
+                <div className="flex items-center relative z-10">
+                  <div className={`p-4 rounded-2xl shadow-lg ${colorClasses[stat.color]} group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className="w-7 h-7" />
+                  </div>
+                  <div className="ml-5 flex-1">
+                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">{stat.title}</p>
+                    <p className="text-3xl font-bold text-gray-900 mt-1 group-hover:text-blue-600 transition-colors">{stat.value}</p>
+                    <p className="text-sm text-gray-600 mt-1 font-medium">{stat.subtitle}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -247,48 +255,77 @@ const DashboardStats = ({ role }) => {
       </div>
 
       {/* Recent Activity */}
-      <div className="mt-8 bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 overflow-hidden">
+        <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            <Activity className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+            <div className="p-2 bg-blue-500 rounded-lg shadow-md">
+              <Activity className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900">Recent Activity</h3>
+            <div className="flex-1"></div>
+            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-sm"></div>
+            <span className="text-sm text-gray-500 font-medium">Live</span>
           </div>
         </div>
         <div className="p-6">
           <div className="space-y-4">
             {role === 'admin' && (
               <>
-                <div className="flex items-center space-x-3 text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-gray-600">System running smoothly with {getUsersByRole('hr').length} HR members active</span>
+                <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:shadow-md transition-all duration-200">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full shadow-sm animate-pulse"></div>
+                  <div className="flex-1">
+                    <span className="text-gray-700 font-medium">System running smoothly with</span>
+                    <span className="text-blue-600 font-bold mx-1">{getUsersByRole('hr').length}</span>
+                    <span className="text-gray-700 font-medium">HR members active</span>
+                  </div>
+                  <div className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">HEALTHY</div>
                 </div>
-                <div className="flex items-center space-x-3 text-sm">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-600">All departments functioning normally</span>
+                <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100 hover:shadow-md transition-all duration-200">
+                  <div className="w-3 h-3 bg-green-500 rounded-full shadow-sm"></div>
+                  <div className="flex-1">
+                    <span className="text-gray-700 font-medium">All departments functioning normally</span>
+                  </div>
+                  <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">OPERATIONAL</div>
                 </div>
               </>
             )}
             {role === 'hr' && (
               <>
-                <div className="flex items-center space-x-3 text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-gray-600">Managing {getUsersByRole('employee').filter(emp => emp.createdBy === currentUser._id).length} employees</span>
+                <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:shadow-md transition-all duration-200">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full shadow-sm"></div>
+                  <div className="flex-1">
+                    <span className="text-gray-700 font-medium">Managing</span>
+                    <span className="text-blue-600 font-bold mx-1">{getUsersByRole('employee').filter(emp => emp.createdBy === currentUser._id).length}</span>
+                    <span className="text-gray-700 font-medium">employees</span>
+                  </div>
+                  <div className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">MANAGING</div>
                 </div>
-                <div className="flex items-center space-x-3 text-sm">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                  <span className="text-gray-600">{getLeavesByApprover(currentUser._id).filter(l => l.status === 'pending').length} leave requests pending review</span>
+                <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100 hover:shadow-md transition-all duration-200">
+                  <div className="w-3 h-3 bg-orange-500 rounded-full shadow-sm animate-pulse"></div>
+                  <div className="flex-1">
+                    <span className="text-orange-600 font-bold">{getLeavesByApprover(currentUser._id).filter(l => l.status === 'pending').length}</span>
+                    <span className="text-gray-700 font-medium mx-1">leave requests pending review</span>
+                  </div>
+                  <div className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">PENDING</div>
                 </div>
               </>
             )}
             {role === 'employee' && (
               <>
-                <div className="flex items-center space-x-3 text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-gray-600">{getTasksByUser(currentUser._id).filter(t => t.status === 'pending').length} tasks pending completion</span>
+                <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:shadow-md transition-all duration-200">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full shadow-sm animate-pulse"></div>
+                  <div className="flex-1">
+                    <span className="text-blue-600 font-bold">{getTasksByUser(currentUser._id).filter(t => t.status === 'pending').length}</span>
+                    <span className="text-gray-700 font-medium mx-1">tasks pending completion</span>
+                  </div>
+                  <div className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">IN PROGRESS</div>
                 </div>
-                <div className="flex items-center space-x-3 text-sm">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-600">Attendance up to date</span>
+                <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100 hover:shadow-md transition-all duration-200">
+                  <div className="w-3 h-3 bg-green-500 rounded-full shadow-sm"></div>
+                  <div className="flex-1">
+                    <span className="text-gray-700 font-medium">Attendance up to date</span>
+                  </div>
+                  <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">UP TO DATE</div>
                 </div>
               </>
             )}

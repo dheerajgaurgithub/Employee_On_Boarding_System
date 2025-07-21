@@ -70,44 +70,60 @@ const AddEmployeeForm = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex items-center space-x-3 mb-6">
-        <UserPlus className="w-6 h-6 text-blue-600" />
-        <h2 className="text-2xl font-bold text-gray-900">Add New Employee</h2>
+    <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-2xl p-8 border border-slate-200">
+      <div className="flex items-center space-x-4 mb-8">
+        <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-lg">
+          <UserPlus className="w-8 h-8 text-white" />
+        </div>
+        <div>
+          <h2 className="text-3xl font-bold text-slate-800">Add New Employee</h2>
+          <p className="text-slate-600 mt-1">Create a new employee profile with auto-generated credentials</p>
+        </div>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center text-red-700">
-          <AlertCircle className="w-5 h-5 mr-2" />
-          {error}
+        <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-red-100 border-2 border-red-200 rounded-xl flex items-start space-x-3 shadow-md">
+          <div className="p-1 bg-red-200 rounded-full mt-0.5">
+            <AlertCircle className="w-5 h-5 text-red-600" />
+          </div>
+          <div>
+            <h4 className="font-semibold text-red-800 mb-1">Error Occurred</h4>
+            <p className="text-red-700">{error}</p>
+          </div>
         </div>
       )}
 
       {credentials && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center text-green-700 mb-2">
-            <CheckCircle className="w-5 h-5 mr-2" />
-            <span className="font-medium">Employee Added Successfully!</span>
-          </div>
-          <div className="space-y-2 text-sm">
-            <div className="flex items-center space-x-2">
-              <Mail className="w-4 h-4" />
-              <span className="font-medium">Email:</span>
-              <span className="bg-green-100 px-2 py-1 rounded">{credentials.email}</span>
+        <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-100 border-2 border-green-200 rounded-xl shadow-lg">
+          <div className="flex items-center text-green-700 mb-4">
+            <div className="p-2 bg-green-200 rounded-full mr-3">
+              <CheckCircle className="w-6 h-6 text-green-600" />
             </div>
-            <div className="flex items-center space-x-2">
-              <Lock className="w-4 h-4" />
-              <span className="font-medium">Password:</span>
-              <span className="bg-green-100 px-2 py-1 rounded">{credentials.password}</span>
+            <div>
+              <h3 className="font-bold text-lg text-green-800">Employee Added Successfully!</h3>
+              <p className="text-sm text-green-600">Save these credentials securely</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-green-200">
+              <Mail className="w-5 h-5 text-green-600" />
+              <span className="font-semibold text-slate-700">Email:</span>
+              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-mono text-sm">{credentials.email}</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-green-200">
+              <Lock className="w-5 h-5 text-green-600" />
+              <span className="font-semibold text-slate-700">Password:</span>
+              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-mono text-sm">{credentials.password}</span>
             </div>
           </div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-700 mb-2 flex items-center">
+              <div className="w-2 h-4 bg-blue-500 rounded-full mr-2"></div>
               Full Name *
             </label>
             <input
@@ -115,42 +131,48 @@ const AddEmployeeForm = () => {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md placeholder-slate-400"
               placeholder="Enter employee's full name"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-700 mb-2 flex items-center">
+              <div className="w-2 h-4 bg-green-500 rounded-full mr-2"></div>
               Phone Number *
             </label>
             <div className="relative">
-              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 p-1 bg-slate-100 rounded-full">
+                <Phone className="text-slate-600 w-4 h-4" />
+              </div>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md placeholder-slate-400"
                 placeholder="+91-9876543210"
                 required
               />
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-700 mb-2 flex items-center">
+              <div className="w-2 h-4 bg-yellow-500 rounded-full mr-2"></div>
               Monthly Salary (₹) *
             </label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 p-1 bg-slate-100 rounded-full">
+                <DollarSign className="text-slate-600 w-4 h-4" />
+              </div>
               <input
                 type="number"
                 name="salary"
                 value={formData.salary}
                 onChange={handleInputChange}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md placeholder-slate-400"
                 placeholder="30000"
                 min="0"
                 step="1000"
@@ -159,8 +181,9 @@ const AddEmployeeForm = () => {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-700 mb-2 flex items-center">
+              <div className="w-2 h-4 bg-purple-500 rounded-full mr-2"></div>
               Profile Picture URL
             </label>
             <input
@@ -168,27 +191,44 @@ const AddEmployeeForm = () => {
               name="profilePicture"
               value={formData.profilePicture}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md placeholder-slate-400"
               placeholder="https://example.com/photo.jpg"
             />
           </div>
         </div>
 
-        <div className="border rounded-lg p-4 bg-blue-50">
-          <h3 className="font-medium text-blue-900 mb-2">Auto-Generated Credentials</h3>
-          <p className="text-sm text-blue-700">
-            Email and password will be automatically generated based on the employee's name.
-            The credentials will be displayed after successful creation.
-          </p>
+        <div className="border-2 border-blue-200 rounded-xl p-6 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-md">
+          <div className="flex items-start space-x-4">
+            <div className="p-2 bg-blue-200 rounded-full">
+              <Lock className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="font-bold text-blue-900 mb-2 text-lg">Auto-Generated Credentials</h3>
+              <p className="text-blue-700 leading-relaxed">
+                Email and password will be automatically generated based on the employee's name.
+                The credentials will be displayed after successful creation for secure sharing.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-4">
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50"
+            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-200 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center space-x-3"
           >
-            {loading ? 'Adding Employee...' : 'Add Employee'}
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                <span>Adding Employee...</span>
+              </>
+            ) : (
+              <>
+                <UserPlus className="w-5 h-5" />
+                <span>Add Employee</span>
+              </>
+            )}
           </button>
         </div>
       </form>

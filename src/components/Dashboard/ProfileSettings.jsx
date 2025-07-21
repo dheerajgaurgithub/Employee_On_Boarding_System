@@ -34,150 +34,175 @@ const ProfileSettings = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center space-x-3">
-          <Settings className="w-6 h-6 text-blue-600" />
-          <h2 className="text-2xl font-bold text-gray-900">Profile Settings</h2>
+  <div className="bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/50 rounded-3xl shadow-2xl border border-gray-100/50 backdrop-blur-sm">
+    <div className="p-8 border-b border-gray-100 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-t-3xl relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-black/10"></div>
+      <div className="absolute -top-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+      <div className="absolute -bottom-2 -left-8 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+      
+      <div className="relative flex items-center space-x-4">
+        <div className="p-4 bg-white/20 backdrop-blur-md rounded-2xl ring-2 ring-white/20">
+          <Settings className="w-8 h-8 text-white" />
         </div>
-        <p className="text-gray-600 mt-1">Manage your personal information and preferences</p>
-      </div>
-
-      <div className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Profile Picture Section */}
-          <div className="flex items-center space-x-6">
-            <div className="relative">
-              <img
-                src={formData.profilePicture}
-                alt="Profile"
-                className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
-              />
-              <div className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full">
-                <Camera className="w-4 h-4" />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">Profile Picture</h3>
-              <p className="text-sm text-gray-600">Update your profile picture by entering a new URL</p>
-            </div>
-          </div>
-
-          {/* Form Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter your full name"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="+91-9876543210"
-                />
-              </div>
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="email"
-                  value={currentUser.email}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
-                  disabled
-                  placeholder="Email cannot be changed"
-                />
-              </div>
-              <p className="text-xs text-gray-500 mt-1">Email address cannot be modified</p>
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Profile Picture URL
-              </label>
-              <div className="relative">
-                <Camera className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="url"
-                  name="profilePicture"
-                  value={formData.profilePicture}
-                  onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="https://example.com/your-photo.jpg"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Account Information (Read-only) */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-900 mb-3">Account Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-gray-600">Role:</span>
-                <span className="ml-2 font-medium text-gray-900 capitalize">{currentUser.role}</span>
-              </div>
-              <div>
-                <span className="text-gray-600">Account Status:</span>
-                <span className="ml-2 font-medium text-green-600">{currentUser.status}</span>
-              </div>
-              <div>
-                <span className="text-gray-600">Member Since:</span>
-                <span className="ml-2 font-medium text-gray-900">
-                  {new Date(currentUser.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-              {currentUser.salary && (
-                <div>
-                  <span className="text-gray-600">Salary:</span>
-                  <span className="ml-2 font-medium text-gray-900">
-                    ₹{currentUser.salary.toLocaleString()}/month
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Save Button */}
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50"
-            >
-              <Save className="w-5 h-5" />
-              <span>{saving ? 'Saving...' : 'Save Changes'}</span>
-            </button>
-          </div>
-        </form>
+        <div>
+          <h2 className="text-3xl font-bold text-white">Profile Settings</h2>
+          <p className="text-blue-100 mt-2 font-medium">Manage your personal information and preferences</p>
+        </div>
       </div>
     </div>
-  );
+
+    <div className="p-8">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Profile Picture Section */}
+        <div className="flex items-center space-x-8 p-6 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 rounded-2xl border border-blue-100/50">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
+            <img
+              src={formData.profilePicture}
+              alt="Profile"
+              className="relative w-28 h-28 rounded-full object-cover border-4 border-white shadow-xl ring-4 ring-blue-100/50"
+            />
+            <div className="absolute bottom-0 right-0 bg-gradient-to-r from-blue-500 to-indigo-500 text-white p-3 rounded-full shadow-lg ring-4 ring-white hover:scale-110 transition-transform duration-200 cursor-pointer">
+              <Camera className="w-5 h-5" />
+            </div>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Profile Picture</h3>
+            <p className="text-gray-600 leading-relaxed">Update your profile picture by entering a new URL below</p>
+          </div>
+        </div>
+
+        {/* Form Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="group">
+            <label className="block text-sm font-bold text-gray-800 mb-3">
+              Full Name
+            </label>
+            <div className="relative">
+              <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-500 transition-colors" />
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-blue-300"
+                placeholder="Enter your full name"
+              />
+            </div>
+          </div>
+
+          <div className="group">
+            <label className="block text-sm font-bold text-gray-800 mb-3">
+              Phone Number
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-500 transition-colors" />
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-blue-300"
+                placeholder="+91-9876543210"
+              />
+            </div>
+          </div>
+
+          <div className="md:col-span-2 group">
+            <label className="block text-sm font-bold text-gray-800 mb-3">
+              Email Address
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="email"
+                value={currentUser.email}
+                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 text-gray-500 cursor-not-allowed"
+                disabled
+                placeholder="Email cannot be changed"
+              />
+            </div>
+            <p className="text-sm text-gray-500 mt-2 flex items-center">
+              <span className="w-2 h-2 bg-amber-400 rounded-full mr-2"></span>
+              Email address cannot be modified for security reasons
+            </p>
+          </div>
+
+          <div className="md:col-span-2 group">
+            <label className="block text-sm font-bold text-gray-800 mb-3">
+              Profile Picture URL
+            </label>
+            <div className="relative">
+              <Camera className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-500 transition-colors" />
+              <input
+                type="url"
+                name="profilePicture"
+                value={formData.profilePicture}
+                onChange={handleInputChange}
+                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-blue-300"
+                placeholder="https://example.com/your-photo.jpg"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Account Information (Read-only) */}
+        <div className="bg-gradient-to-br from-slate-50 via-gray-50 to-blue-50/30 rounded-2xl p-6 border border-gray-100 shadow-inner">
+          <div className="flex items-center mb-4">
+            <div className="p-2 bg-gradient-to-r from-slate-600 to-gray-600 rounded-lg mr-3">
+              <div className="w-4 h-4 bg-white rounded-sm"></div>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900">Account Information</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex items-center p-3 bg-white/60 rounded-xl backdrop-blur-sm">
+              <span className="text-gray-600 font-medium mr-3">Role:</span>
+              <span className="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-bold rounded-full capitalize shadow-md">
+                {currentUser.role}
+              </span>
+            </div>
+            <div className="flex items-center p-3 bg-white/60 rounded-xl backdrop-blur-sm">
+              <span className="text-gray-600 font-medium mr-3">Status:</span>
+              <span className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold rounded-full shadow-md">
+                {currentUser.status}
+              </span>
+            </div>
+            <div className="flex items-center p-3 bg-white/60 rounded-xl backdrop-blur-sm">
+              <span className="text-gray-600 font-medium mr-3">Member Since:</span>
+              <span className="font-bold text-gray-900">
+                {new Date(currentUser.createdAt).toLocaleDateString()}
+              </span>
+            </div>
+            {currentUser.salary && (
+              <div className="flex items-center p-3 bg-white/60 rounded-xl backdrop-blur-sm">
+                <span className="text-gray-600 font-medium mr-3">Salary:</span>
+                <span className="font-bold text-gray-900">
+                  ₹{currentUser.salary.toLocaleString()}/month
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Save Button */}
+        <div className="flex justify-end pt-4">
+          <button
+            type="submit"
+            disabled={saving}
+            className="group relative flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-2xl hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-500/50 transition-all duration-300 disabled:opacity-50 shadow-xl hover:shadow-2xl hover:scale-105 transform"
+          >
+            <Save className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
+            <span className="text-lg font-bold">{saving ? 'Saving Changes...' : 'Save Changes'}</span>
+            {saving && (
+              <div className="absolute inset-0 bg-white/20 rounded-2xl animate-pulse"></div>
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+);
 };
 
 export default ProfileSettings;

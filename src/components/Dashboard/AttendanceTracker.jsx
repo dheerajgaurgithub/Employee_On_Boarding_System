@@ -68,29 +68,36 @@ const AttendanceTracker = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center space-x-3">
-          <Clock className="w-6 h-6 text-blue-600" />
-          <h2 className="text-2xl font-bold text-gray-900">Attendance Tracker</h2>
+    <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl shadow-xl border border-slate-200">
+      <div className="p-8 border-b border-slate-200 bg-white rounded-t-xl">
+        <div className="flex items-center space-x-4">
+          <div className="p-3 bg-blue-100 rounded-full">
+            <Clock className="w-8 h-8 text-blue-600" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-slate-800">Attendance Tracker</h2>
+            <p className="text-slate-600 mt-1 text-lg">Mark and track employee attendance</p>
+          </div>
         </div>
-        <p className="text-gray-600 mt-1">Mark and track employee attendance</p>
       </div>
 
-      <div className="p-6">
+      <div className="p-8">
         {/* Mark Attendance Form */}
-        <div className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
-          <h3 className="text-lg font-semibold mb-4">Mark Attendance</h3>
-          <form onSubmit={handleMarkAttendance} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="mb-10 p-6 border-2 border-blue-200 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <h3 className="text-xl font-bold mb-6 text-slate-800 flex items-center">
+            <div className="w-2 h-8 bg-blue-500 rounded-full mr-3"></div>
+            Mark Attendance
+          </h3>
+          <form onSubmit={handleMarkAttendance} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Select Employee *
                 </label>
                 <select
                   value={selectedEmployee}
                   onChange={(e) => setSelectedEmployee(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
                   required
                 >
                   <option value="">Choose Employee</option>
@@ -100,14 +107,14 @@ const AttendanceTracker = () => {
                 </select>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Status *
                 </label>
                 <select
                   value={attendanceStatus}
                   onChange={(e) => setAttendanceStatus(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
                 >
                   <option value="present">Present</option>
                   <option value="absent">Absent</option>
@@ -116,15 +123,15 @@ const AttendanceTracker = () => {
               </div>
 
               {attendanceStatus === 'present' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Check-in Time
                   </label>
                   <input
                     type="time"
                     value={checkInTime}
                     onChange={(e) => setCheckInTime(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
                   />
                 </div>
               )}
@@ -132,7 +139,7 @@ const AttendanceTracker = () => {
             
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               Mark Attendance
             </button>
@@ -140,32 +147,39 @@ const AttendanceTracker = () => {
         </div>
 
         {/* Today's Attendance */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4">Today's Attendance ({new Date().toLocaleDateString()})</h3>
+        <div className="mb-10">
+          <h3 className="text-2xl font-bold mb-6 text-slate-800 flex items-center">
+            <div className="w-2 h-8 bg-emerald-500 rounded-full mr-3"></div>
+            Today's Attendance ({new Date().toLocaleDateString()})
+          </h3>
           {todayAttendance.length === 0 ? (
-            <div className="text-center py-8 bg-gray-50 rounded-lg">
-              <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h4 className="text-lg font-medium text-gray-900 mb-2">No Attendance Marked</h4>
-              <p className="text-gray-600">Start marking attendance for your employees.</p>
+            <div className="text-center py-12 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border-2 border-dashed border-slate-300">
+              <div className="p-4 bg-slate-200 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                <Clock className="w-12 h-12 text-slate-500" />
+              </div>
+              <h4 className="text-xl font-semibold text-slate-800 mb-3">No Attendance Marked</h4>
+              <p className="text-slate-600 text-lg">Start marking attendance for your employees.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {todayAttendance.map((attendance) => (
-                <div key={attendance.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-gray-900">{attendance.employeeName}</h4>
-                    {getStatusIcon(attendance.status)}
+                <div key={attendance.id} className="border-2 border-slate-200 rounded-xl p-6 bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-bold text-slate-900 text-lg">{attendance.employeeName}</h4>
+                    <div className="p-2 rounded-full bg-slate-100">
+                      {getStatusIcon(attendance.status)}
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(attendance.status)}`}>
+                  <div className="space-y-3">
+                    <span className={`inline-block px-3 py-2 text-sm font-bold rounded-full ${getStatusColor(attendance.status)} shadow-sm`}>
                       {attendance.status.toUpperCase()}
                     </span>
                     {attendance.checkInTime && (
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm font-medium text-slate-700 bg-slate-100 px-3 py-2 rounded-lg">
                         Check-in: {attendance.checkInTime}
                       </div>
                     )}
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-lg">
                       Marked at: {new Date(attendance.date).toLocaleTimeString()}
                     </div>
                   </div>
@@ -177,15 +191,20 @@ const AttendanceTracker = () => {
 
         {/* Employee Attendance History */}
         <div>
-          <h3 className="text-lg font-semibold mb-4">Employee Attendance Summary</h3>
+          <h3 className="text-2xl font-bold mb-6 text-slate-800 flex items-center">
+            <div className="w-2 h-8 bg-purple-500 rounded-full mr-3"></div>
+            Employee Attendance Summary
+          </h3>
           {employees.length === 0 ? (
-            <div className="text-center py-8 bg-gray-50 rounded-lg">
-              <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h4 className="text-lg font-medium text-gray-900 mb-2">No Employees</h4>
-              <p className="text-gray-600">Add employees to track their attendance.</p>
+            <div className="text-center py-12 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border-2 border-dashed border-slate-300">
+              <div className="p-4 bg-slate-200 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                <User className="w-12 h-12 text-slate-500" />
+              </div>
+              <h4 className="text-xl font-semibold text-slate-800 mb-3">No Employees</h4>
+              <p className="text-slate-600 text-lg">Add employees to track their attendance.</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {employees.map((employee) => {
                 const employeeAttendance = getAttendanceByUser(employee._id);
                 const presentDays = employeeAttendance.filter(a => a.status === 'present').length;
@@ -193,31 +212,36 @@ const AttendanceTracker = () => {
                 const absentDays = employeeAttendance.filter(a => a.status === 'absent').length;
                 
                 return (
-                  <div key={employee._id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center space-x-4 mb-3">
-                      <img
-                        src={employee.profilePicture}
-                        alt={employee.name}
-                        className="w-10 h-10 rounded-full"
-                      />
+                  <div key={employee._id} className="border-2 border-slate-200 rounded-xl p-6 bg-white shadow-lg hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center space-x-6 mb-6">
+                      <div className="relative">
+                        <img
+                          src={employee.profilePicture}
+                          alt={employee.name}
+                          className="w-16 h-16 rounded-full border-4 border-blue-200 shadow-md"
+                        />
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
+                      </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900">{employee.name}</h4>
-                        <p className="text-sm text-gray-600">Total Records: {employeeAttendance.length}</p>
+                        <h4 className="font-bold text-slate-900 text-xl">{employee.name}</h4>
+                        <p className="text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-full inline-block">
+                          Total Records: {employeeAttendance.length}
+                        </p>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div>
-                        <div className="text-lg font-semibold text-green-600">{presentDays}</div>
-                        <div className="text-xs text-gray-600">Present</div>
+                    <div className="grid grid-cols-3 gap-6">
+                      <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border-2 border-green-200">
+                        <div className="text-3xl font-bold text-green-600 mb-2">{presentDays}</div>
+                        <div className="text-sm font-semibold text-green-700">Present</div>
                       </div>
-                      <div>
-                        <div className="text-lg font-semibold text-yellow-600">{lateDays}</div>
-                        <div className="text-xs text-gray-600">Late</div>
+                      <div className="text-center p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl border-2 border-yellow-200">
+                        <div className="text-3xl font-bold text-yellow-600 mb-2">{lateDays}</div>
+                        <div className="text-sm font-semibold text-yellow-700">Late</div>
                       </div>
-                      <div>
-                        <div className="text-lg font-semibold text-red-600">{absentDays}</div>
-                        <div className="text-xs text-gray-600">Absent</div>
+                      <div className="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-xl border-2 border-red-200">
+                        <div className="text-3xl font-bold text-red-600 mb-2">{absentDays}</div>
+                        <div className="text-sm font-semibold text-red-700">Absent</div>
                       </div>
                     </div>
                   </div>
