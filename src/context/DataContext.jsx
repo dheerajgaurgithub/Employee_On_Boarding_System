@@ -99,10 +99,18 @@ export const DataProvider = ({ children }) => {
   };
 
   const getTasksByUser = useCallback((userId) => 
-    tasks.filter(t => t.assignedTo && t.assignedTo._id === userId), [tasks]);
+    tasks.filter(t => {
+      if (!t.assignedTo) return false;
+      if (typeof t.assignedTo === 'object') return t.assignedTo._id === userId;
+      return t.assignedTo === userId;
+    }), [tasks]);
 
   const getTasksByAssigner = useCallback((assignerId) => 
-    tasks.filter(t => t.assignedBy && t.assignedBy._id === assignerId), [tasks]);
+    tasks.filter(t => {
+      if (!t.assignedBy) return false;
+      if (typeof t.assignedBy === 'object') return t.assignedBy._id === assignerId;
+      return t.assignedBy === assignerId;
+    }), [tasks]);
 
   // -------------------- Leave Methods --------------------
   const addLeaveRequest = async (data) => {
@@ -128,10 +136,18 @@ export const DataProvider = ({ children }) => {
   };
 
   const getLeavesByUser = useCallback((userId) => 
-    leaveRequests.filter(l => l.employeeId && l.employeeId._id === userId), [leaveRequests]);
+    leaveRequests.filter(l => {
+      if (!l.employeeId) return false;
+      if (typeof l.employeeId === 'object') return l.employeeId._id === userId;
+      return l.employeeId === userId;
+    }), [leaveRequests]);
 
   const getLeavesByApprover = useCallback((approverId) => 
-    leaveRequests.filter(l => l.appliedTo && l.appliedTo._id === approverId), [leaveRequests]);
+    leaveRequests.filter(l => {
+      if (!l.appliedTo) return false;
+      if (typeof l.appliedTo === 'object') return l.appliedTo._id === approverId;
+      return l.appliedTo === approverId;
+    }), [leaveRequests]);
 
   // -------------------- Attendance Methods --------------------
   const addAttendance = async (data) => {
