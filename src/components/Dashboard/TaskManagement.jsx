@@ -157,21 +157,21 @@ const TaskManagement = ({ role }) => {
   };
 
   return (
-  <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen p-2 sm:p-4 md:p-6">
+  <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen p-4 md:p-6">
     <div className="max-w-6xl mx-auto">
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 sm:p-6 md:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            <div className="flex items-center space-x-3 sm:space-x-4">
-              <div className="p-2 sm:p-3 bg-white/20 rounded-lg sm:rounded-xl backdrop-blur-sm">
-                <CheckSquare className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 md:p-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                <CheckSquare className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                <h2 className="text-3xl font-bold text-white">
                   {role === 'employee' ? 'My Tasks' : 'Task Management'}
                 </h2>
-                <p className="text-blue-100 mt-1 text-sm sm:text-base">
+                <p className="text-blue-100 mt-1">
                   {role === 'employee' ? 'Stay on top of your assignments' : 'Manage and track team tasks'}
                 </p>
               </div>
@@ -179,28 +179,28 @@ const TaskManagement = ({ role }) => {
             {role !== 'employee' && (
               <button
                 onClick={() => setShowAddForm(true)}
-                className="flex items-center justify-center space-x-2 sm:space-x-3 px-4 sm:px-6 py-2.5 sm:py-3 bg-white/20 backdrop-blur-sm text-white rounded-lg sm:rounded-xl hover:bg-white/30 transition-all duration-300 border border-white/30 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base w-full sm:w-auto"
+                className="flex items-center space-x-3 px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-all duration-300 border border-white/30 shadow-lg hover:shadow-xl hover:scale-105"
               >
-                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Plus className="w-5 h-5" />
                 <span className="font-semibold">Add Task</span>
               </button>
             )}
           </div>
         </div>
 
-        <div className="p-4 sm:p-6 md:p-8">
+        <div className="p-6 md:p-8">
           {/* Add Task Form */}
           {showAddForm && (
-            <div className="mb-6 sm:mb-8 p-4 sm:p-6 border-2 border-dashed border-blue-200 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50">
-              <div className="flex items-center space-x-3 mb-4 sm:mb-6">
+            <div className="mb-8 p-6 border-2 border-dashed border-blue-200 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50">
+              <div className="flex items-center space-x-3 mb-6">
                 <div className="p-2 bg-blue-100 rounded-lg">
-                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                  <Plus className="w-5 h-5 text-blue-600" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Create New Task</h3>
+                <h3 className="text-xl font-bold text-gray-900">Create New Task</h3>
               </div>
               
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="block text-sm font-semibold text-gray-700">
                       Task Title <span className="text-red-500">*</span>
@@ -209,7 +209,7 @@ const TaskManagement = ({ role }) => {
                       type="text"
                       value={formData.title}
                       onChange={(e) => setFormData({...formData, title: e.target.value})}
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300 bg-white shadow-sm hover:shadow-md text-sm sm:text-base"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
                       placeholder="Enter a descriptive task title"
                       required
                     />
@@ -222,7 +222,7 @@ const TaskManagement = ({ role }) => {
                     <select
                       value={formData.assignedTo}
                       onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300 bg-white shadow-sm hover:shadow-md text-sm sm:text-base"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
                       required
                     >
                       <option value="">Select {role === 'admin' ? 'HR' : 'Employee'}</option>
@@ -237,7 +237,7 @@ const TaskManagement = ({ role }) => {
                     <select
                       value={formData.priority}
                       onChange={(e) => setFormData({...formData, priority: e.target.value})}
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300 bg-white shadow-sm hover:shadow-md text-sm sm:text-base"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
                     >
                       <option value="low">🟢 Low Priority</option>
                       <option value="medium">🟡 Medium Priority</option>
@@ -251,7 +251,7 @@ const TaskManagement = ({ role }) => {
                       type="date"
                       value={formData.dueDate}
                       onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300 bg-white shadow-sm hover:shadow-md text-sm sm:text-base"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300 bg-white shadow-sm hover:shadow-md"
                     />
                   </div>
                 </div>
@@ -261,9 +261,9 @@ const TaskManagement = ({ role }) => {
                     <label className="block text-sm font-semibold text-gray-700 mb-3">
                       Allowed Submission Formats
                     </label>
-                    <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
+                    <div className="flex flex-wrap gap-4">
                       {['pdf', 'doc', 'text'].map(fmt => (
-                        <label key={fmt} className="inline-flex items-center space-x-3 p-3 border border-gray-200 rounded-lg sm:rounded-xl hover:bg-gray-50 cursor-pointer transition-all duration-300">
+                        <label key={fmt} className="inline-flex items-center space-x-3 p-3 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-all duration-300">
                           <input
                             type="checkbox"
                             checked={formData.allowedFormats.includes(fmt)}
@@ -288,24 +288,24 @@ const TaskManagement = ({ role }) => {
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300 bg-white shadow-sm hover:shadow-md resize-none text-sm sm:text-base"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300 bg-white shadow-sm hover:shadow-md resize-none"
                       rows="4"
                       placeholder="Provide detailed instructions and requirements for this task..."
                     />
                   </div>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
+                <div className="flex space-x-4 pt-4">
                   <button
                     type="submit"
-                    className="flex-1 px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base"
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105"
                   >
                     Create Task
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowAddForm(false)}
-                    className="px-4 sm:px-6 py-3 bg-gray-100 text-gray-700 rounded-lg sm:rounded-xl hover:bg-gray-200 transition-all duration-300 font-semibold border border-gray-200 text-sm sm:text-base"
+                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-300 font-semibold border border-gray-200"
                   >
                     Cancel
                   </button>
@@ -316,14 +316,14 @@ const TaskManagement = ({ role }) => {
 
           {/* Empty State */}
           {myTasks.length === 0 ? (
-            <div className="text-center py-12 sm:py-16">
-              <div className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl sm:rounded-3xl w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-6 sm:mb-8 flex items-center justify-center">
-                <CheckSquare className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
+            <div className="text-center py-16">
+              <div className="p-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-3xl w-32 h-32 mx-auto mb-8 flex items-center justify-center">
+                <CheckSquare className="w-16 h-16 text-gray-400" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
                 {role === 'employee' ? 'No Tasks Assigned' : 'No Tasks Created'}
               </h3>
-              <p className="text-gray-600 text-base sm:text-lg max-w-md mx-auto px-4">
+              <p className="text-gray-600 text-lg max-w-md mx-auto">
                 {role === 'employee' 
                   ? 'You\'re all caught up! New tasks will appear here when assigned.' 
                   : 'Get started by creating your first task for your team.'
@@ -332,58 +332,56 @@ const TaskManagement = ({ role }) => {
             </div>
           ) : (
             /* Task List */
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-6">
               {myTasks.map((task) => {
                 const assignedUser = getUserById(task.assignedTo);
                 const assigner = getUserById(task.assignedBy);
                 
                 return (
-                  <div key={task._id} className="group border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all duration-300 bg-white hover:border-blue-200 hover:-translate-y-1">
-                    <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-4 space-y-4 lg:space-y-0">
-                      <div className="flex-1 lg:pr-6">
+                  <div key={task._id} className="group border border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 bg-white hover:border-blue-200 hover:-translate-y-1">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
                         {/* Task Header */}
-                        <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-2 sm:gap-3 mb-4">
-                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300 break-words">
+                        <div className="flex items-center flex-wrap gap-3 mb-4">
+                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
                             {task.title}
                           </h3>
                           
-                          <div className="flex flex-wrap gap-2">
-                            <span className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-bold rounded-full border-2 ${getPriorityColor(task.priority)} shadow-sm`}>
-                              {task.priority === 'high' ? '🔴 HIGH' : task.priority === 'medium' ? '🟡 MEDIUM' : '🟢 LOW'}
+                          <span className={`px-3 py-1.5 text-xs font-bold rounded-full border-2 ${getPriorityColor(task.priority)} shadow-sm`}>
+                            {task.priority === 'high' ? '🔴 HIGH' : task.priority === 'medium' ? '🟡 MEDIUM' : '🟢 LOW'}
+                          </span>
+                          
+                          <span className={`px-3 py-1.5 text-xs font-bold rounded-full ${getStatusColor(task.status)} shadow-sm`}>
+                            {task.status.replace('-', ' ').toUpperCase()}
+                          </span>
+                          
+                          {/* Approval Status Badge */}
+                          {task.status === 'completed' && (
+                            <span className={`px-3 py-1.5 text-xs font-bold rounded-full border-2 shadow-sm ${
+                              task.approvalStatus === 'approved' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 
+                              task.approvalStatus === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' : 
+                              'bg-amber-100 text-amber-800 border-amber-300'
+                            }`}>
+                              {task.approvalStatus === 'approved' ? '✅ APPROVED' : 
+                               task.approvalStatus === 'rejected' ? '❌ REJECTED' : 
+                               '⏳ PENDING APPROVAL'}
                             </span>
-                            
-                            <span className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-bold rounded-full ${getStatusColor(task.status)} shadow-sm`}>
-                              {task.status.replace('-', ' ').toUpperCase()}
-                            </span>
-                            
-                            {/* Approval Status Badge */}
-                            {task.status === 'completed' && (
-                              <span className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-bold rounded-full border-2 shadow-sm ${
-                                task.approvalStatus === 'approved' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 
-                                task.approvalStatus === 'rejected' ? 'bg-red-100 text-red-800 border-red-300' : 
-                                'bg-amber-100 text-amber-800 border-amber-300'
-                              }`}>
-                                {task.approvalStatus === 'approved' ? '✅ APPROVED' : 
-                                 task.approvalStatus === 'rejected' ? '❌ REJECTED' : 
-                                 '⏳ PENDING'}
-                              </span>
-                            )}
-                          </div>
+                          )}
                         </div>
                         
                         {task.description && (
-                          <div className="mb-4 p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl border border-gray-100">
-                            <p className="text-gray-700 leading-relaxed text-sm sm:text-base break-words">{task.description}</p>
+                          <div className="mb-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <p className="text-gray-700 leading-relaxed">{task.description}</p>
                           </div>
                         )}
                         
                         {/* Task Metadata */}
-                        <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-3 sm:gap-6 text-sm">
+                        <div className="flex items-center flex-wrap gap-6 text-sm">
                           <div className="flex items-center space-x-2 text-gray-600">
                             <div className="p-1.5 bg-blue-100 rounded-lg">
-                              <User className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
+                              <User className="w-4 h-4 text-blue-600" />
                             </div>
-                            <span className="font-medium text-xs sm:text-sm">
+                            <span className="font-medium">
                               {role === 'employee' 
                                 ? `Assigned by: ${assigner?.name}` 
                                 : `Assigned to: ${assignedUser?.name}`
@@ -394,29 +392,29 @@ const TaskManagement = ({ role }) => {
                           {task.dueDate && (
                             <div className="flex items-center space-x-2 text-gray-600">
                               <div className="p-1.5 bg-orange-100 rounded-lg">
-                                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-orange-600" />
+                                <Calendar className="w-4 h-4 text-orange-600" />
                               </div>
-                              <span className="font-medium text-xs sm:text-sm">Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                              <span className="font-medium">Due: {new Date(task.dueDate).toLocaleDateString()}</span>
                             </div>
                           )}
                           
                           <div className="flex items-center space-x-2 text-gray-600">
                             <div className="p-1.5 bg-gray-100 rounded-lg">
-                              <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
+                              <Clock className="w-4 h-4 text-gray-600" />
                             </div>
-                            <span className="font-medium text-xs sm:text-sm">Created: {new Date(task.createdAt).toLocaleDateString()}</span>
+                            <span className="font-medium">Created: {new Date(task.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
                       </div>
                       
                       {/* Action Buttons */}
-                      <div className="flex flex-row lg:flex-col gap-2 lg:space-y-2 lg:ml-6">
+                      <div className="flex flex-col space-y-2 ml-6">
                         {role === 'employee' && task.status !== 'completed' && (
                           <>
                             {task.status === 'pending' && (
                               <button
                                 onClick={() => handleStatusUpdate(task._id, 'in-progress')}
-                                className="flex-1 lg:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg sm:rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 whitespace-nowrap"
+                                className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
                               >
                                 🚀 Start Task
                               </button>
@@ -424,7 +422,7 @@ const TaskManagement = ({ role }) => {
                             {task.status === 'in-progress' && (
                               <button
                                 onClick={() => handleStatusUpdate(task._id, 'completed')}
-                                className="flex-1 lg:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg sm:rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 whitespace-nowrap"
+                                className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                                 disabled={!submissionData.documentUrl.trim()}
                               >
                                 ✅ Complete
@@ -435,16 +433,16 @@ const TaskManagement = ({ role }) => {
                         
                         {/* Approve/Reject buttons for HR/Admin */}
                         {role !== 'employee' && task.status === 'completed' && task.approvalStatus === 'pending' && (
-                          <div className="flex flex-row lg:flex-col gap-2 lg:space-y-2 flex-1 lg:flex-none">
+                          <div className="flex flex-col space-y-2">
                             <button
                               onClick={async () => await updateTask(task._id, { approvalStatus: 'approved' })}
-                              className="flex-1 lg:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg sm:rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 whitespace-nowrap"
+                              className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
                             >
                               ✅ Approve
                             </button>
                             <button
                               onClick={async () => await updateTask(task._id, { approvalStatus: 'rejected' })}
-                              className="flex-1 lg:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg sm:rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 whitespace-nowrap"
+                              className="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
                             >
                               ❌ Reject
                             </button>
@@ -457,10 +455,10 @@ const TaskManagement = ({ role }) => {
                     {renderSubmissionDetails(task)}
                     
                     {task.submittedAt && (
-                      <div className="mt-4 sm:mt-6 pt-4 border-t-2 border-green-100">
-                        <div className="flex items-start space-x-2 text-green-700 bg-green-50 p-3 rounded-lg sm:rounded-xl border border-green-200">
-                          <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                          <span className="font-semibold text-sm sm:text-base">
+                      <div className="mt-6 pt-4 border-t-2 border-green-100">
+                        <div className="flex items-center space-x-2 text-green-700 bg-green-50 p-3 rounded-xl border border-green-200">
+                          <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                          <span className="font-semibold">
                             Task completed on {new Date(task.submittedAt).toLocaleDateString('en-US', { 
                               weekday: 'long', 
                               year: 'numeric', 
