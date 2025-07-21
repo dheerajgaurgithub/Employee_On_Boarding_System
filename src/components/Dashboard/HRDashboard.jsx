@@ -23,6 +23,7 @@ import {
   Bell,
   LogOut,
 } from 'lucide-react';
+import { Menu } from "@heroicons/react/outline";
 
 const HRDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
