@@ -211,6 +211,7 @@ export const DataProvider = ({ children }) => {
     try {
       const updatedNotification = await apiService.markNotificationRead(id);
       setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
+      await loadNotifications();
       return updatedNotification;
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
