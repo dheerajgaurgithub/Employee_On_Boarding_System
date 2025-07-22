@@ -23,14 +23,12 @@ const app = express();
 const server = http.createServer(app);
 
 // 🌐 CORS Configuration
-const allowedOrigins = process.env.CORS_ORIGINS
-  ? process.env.CORS_ORIGINS.split(',') // comma-separated in .env
-  : ["http://localhost:5173", "https://employee-on-boarding-system.vercel.app"];
-
+const allowedOrigins = ['https://employee-on-boarding-system-o8kf2hgdj.vercel.app', 'http://localhost:5173'];
 app.use(cors({
   origin: allowedOrigins,
-  credentials: true
+  credentials: true,
 }));
+
 
 // 🔧 Middlewares
 app.use(express.json());
