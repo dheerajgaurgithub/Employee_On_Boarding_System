@@ -1,4 +1,10 @@
-const API_BASE_URL = 'https://employee-on-boarding-system.onrender.com/api';
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:5000/api',
+  withCredentials: true
+});
+
 
 class ApiService {
   constructor() {

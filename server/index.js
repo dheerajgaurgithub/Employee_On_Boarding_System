@@ -31,10 +31,7 @@ const io = socketIo(server, {
 
 // 🌐 Enable CORS for API routes
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://employee-on-boarding-system.vercel.app"
-  ],
+  origin: "*",
   credentials: true
 }));
 app.use(express.json());

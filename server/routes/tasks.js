@@ -1,320 +1,196 @@
-import React, { useEffect, useState } from "react";
-import axios from "../../services/api";
-import { useAuth } from "../../context/AuthContext";
-import { useData } from "../../context/DataContext";
+const express = require('express');
+const Task = require('../models/Task');
+const Notification = require('../models/Notification');
+const { auth } = require('../middleware/auth');
 
-const TaskManagement = () => {
-  const { currentUser, token } = useAuth();
-  const { getUsersByRole } = useData();
+const router = express.Router();
 
-  const [tasks, setTasks] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const [newTask, setNewTask] = useState({
-    title: "",
-    description: "",
-    assignedTo: "",
-    priority: "medium",
-    dueDate: "",
-  });
-
-  const [editingTaskId, setEditingTaskId] = useState(null);
-  const [editValues, setEditValues] = useState({
-    title: "",
-    description: "",
-    priority: "medium",
-    dueDate: "",
-  });
-
-  // Fetch all tasks on load
-  useEffect(() => {
-    fetchTasks();
-    if (currentUser?.role === "hr" || currentUser?.role === "admin") {
-      fetchUsers();
+// Get tasks
+router.get('/', auth, async (req, res) => {
+  try {
+    let query = {};
+    
+    if (req.user.role === 'employee') {
+      query.assignedTo = req.user._id;
+    } else if (req.user.role === 'hr') {
+      query.assignedBy = req.user._id;
+    } else if (req.user.role === 'admin') {
+      // Admin can see all tasks
+      query = {};
     }
-  }, []);
+    
+    const tasks = await Task.find(query)
+      .populate('assignedTo', 'name email role')
+      .populate('assignedBy', 'name email role')
+      .sort({ createdAt: -1 });
+    
+    res.json(tasks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
-  const fetchTasks = async () => {
-    try {
-      const res = await axios.get("/tasks", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setTasks(res.data);
-      setError("");
-    } catch (err) {
-      console.error(err);
-      setError("Failed to fetch tasks");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchUsers = async () => {
-    try {
-      const employeeUsers = await getUsersByRole("employee");
-      setUsers(employeeUsers);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to fetch users");
-    }
-  };
-
-  const handleInputChange = (e) => {
-    setNewTask({ ...newTask, [e.target.name]: e.target.value });
-  };
-
-  const handleEditInputChange = (e) => {
-    setEditValues({ ...editValues, [e.target.name]: e.target.value });
-  };
-
-  const handleCreateTask = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("/tasks", newTask, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setNewTask({
-        title: "",
-        description: "",
-        assignedTo: "",
-        priority: "medium",
-        dueDate: "",
-      });
-      fetchTasks();
-    } catch (err) {
-      console.error(err);
-      setError("Failed to create task");
-    }
-  };
-
-  const handleEditTask = (task) => {
-    setEditingTaskId(task._id);
-    setEditValues({
-      title: task.title,
-      description: task.description,
-      priority: task.priority || "medium",
-      dueDate: task.dueDate ? task.dueDate.slice(0, 10) : "",
+// Create task
+router.post('/', auth, async (req, res) => {
+  try {
+    const { title, description, assignedTo, priority, dueDate } = req.body;
+    
+    const task = new Task({
+      title,
+      description,
+      assignedTo,
+      assignedBy: req.user._id,
+      priority,
+      dueDate
     });
-  };
+    
+    await task.save();
+    await task.populate('assignedTo', 'name email role');
+    await task.populate('assignedBy', 'name email role');
+    
+    // Create notification
+    const notification = new Notification({
+      userId: assignedTo,
+      title: 'New Task Assigned',
+      message: `${req.user.name} has assigned you a new task: ${title}`,
+      type: 'task'
+    });
+    await notification.save();
+    
+    // Emit real-time notification
+    req.io.to(assignedTo).emit('new_notification', notification);
+    
+    res.status(201).json(task);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
-  const handleUpdateTask = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.put(`/tasks/${editingTaskId}`, editValues, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+// Update task
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    let notifyUserId = null;
+    let notificationTitle = '';
+    let notificationMessage = '';
+
+    // Handle task completion with submission
+    if (updates.status === 'completed') {
+      updates.submittedAt = new Date();
+      if (updates.submission) {
+        updates.submission = {
+          documentUrl: updates.submission.documentUrl,
+          documentType: updates.submission.documentType || 'other',
+          notes: updates.submission.notes
+        };
+      }
+      // Notify assigner about completion
+      notifyUserId = (await Task.findById(id)).assignedBy;
+      notificationTitle = 'Task Completed';
+      notificationMessage = `Task "${updates.title || ''}" has been completed with document submission.`;
+    }
+
+    // Handle approval/rejection by HR/Admin
+    if (updates.approvalStatus && ['approved', 'rejected'].includes(updates.approvalStatus)) {
+      const taskDoc = await Task.findById(id);
+      notifyUserId = taskDoc.assignedTo;
+      notificationTitle = `Task ${updates.approvalStatus.charAt(0).toUpperCase() + updates.approvalStatus.slice(1)}`;
+      notificationMessage = `Your task "${taskDoc.title}" has been ${updates.approvalStatus}.`;
+    }
+
+    const task = await Task.findByIdAndUpdate(id, updates, { new: true })
+      .populate('assignedTo', 'name email role')
+      .populate('assignedBy', 'name email role');
+
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    // Send notification if needed
+    if (notifyUserId && notificationTitle && notificationMessage) {
+      const notification = new Notification({
+        userId: notifyUserId,
+        title: notificationTitle,
+        message: notificationMessage,
+        type: 'task'
       });
-      setEditingTaskId(null);
-      fetchTasks();
-    } catch (err) {
-      console.error(err);
-      setError("Failed to update task");
+      await notification.save();
+      req.io.to(notifyUserId.toString()).emit('new_notification', notification);
     }
-  };
 
-  const handleDeleteTask = async (id) => {
-    try {
-      await axios.delete(`/tasks/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    // Notify assigner about status change (if not already notified)
+    if (updates.status && !notifyUserId) {
+      const notification = new Notification({
+        userId: task.assignedBy._id,
+        title: 'Task Status Updated',
+        message: `Task "${task.title}" status changed to ${updates.status}`,
+        type: 'task'
       });
-      fetchTasks();
-    } catch (err) {
-      console.error(err);
-      setError("Failed to delete task");
+      await notification.save();
+      req.io.to(task.assignedBy._id.toString()).emit('new_notification', notification);
     }
-  };
 
-  const handleStatusChange = async (id, status) => {
-    try {
-      await axios.put(
-        `/tasks/${id}`,
-        { status },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      fetchTasks();
-    } catch (err) {
-      console.error(err);
-      setError("Failed to update status");
+    res.json(task);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Approve or reject a submitted task (HR/Admin only)
+router.put('/:id/approval', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { approvalStatus } = req.body;
+    if (!['approved', 'rejected'].includes(approvalStatus)) {
+      return res.status(400).json({ message: 'Invalid approval status' });
     }
-  };
+    const task = await Task.findByIdAndUpdate(id, { approvalStatus }, { new: true })
+      .populate('assignedTo', 'name email role')
+      .populate('assignedBy', 'name email role');
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+    // Notify employee
+    const notification = new Notification({
+      userId: task.assignedTo._id,
+      title: `Task ${approvalStatus.charAt(0).toUpperCase() + approvalStatus.slice(1)}`,
+      message: `Your task "${task.title}" has been ${approvalStatus}.`,
+      type: 'task'
+    });
+    await notification.save();
+    req.io.to(task.assignedTo._id.toString()).emit('new_notification', notification);
+    res.json(task);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
-  return (
-    <div className="p-6 bg-white rounded shadow max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Task Management</h2>
-      {error && <p className="text-red-500 mb-2">{error}</p>}
+// Delete task
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const task = await Task.findById(id);
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+    
+    // Only task assigner can delete
+    if (task.assignedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+    
+    await Task.findByIdAndDelete(id);
+    res.json({ message: 'Task deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
-      {/* Form */}
-      {(currentUser?.role === "hr" || currentUser?.role === "admin") && (
-        <form
-          onSubmit={handleCreateTask}
-          className="grid gap-3 grid-cols-1 md:grid-cols-2 mb-6"
-        >
-          <input
-            name="title"
-            value={newTask.title}
-            onChange={handleInputChange}
-            placeholder="Title"
-            className="border p-2 rounded"
-            required
-          />
-          <input
-            name="description"
-            value={newTask.description}
-            onChange={handleInputChange}
-            placeholder="Description"
-            className="border p-2 rounded"
-            required
-          />
-          <select
-            name="assignedTo"
-            value={newTask.assignedTo}
-            onChange={handleInputChange}
-            className="border p-2 rounded"
-            required
-          >
-            <option value="">Assign To</option>
-            {users.map((user) => (
-              <option key={user._id} value={user._id}>
-                {user.name} ({user.email})
-              </option>
-            ))}
-          </select>
-          <select
-            name="priority"
-            value={newTask.priority}
-            onChange={handleInputChange}
-            className="border p-2 rounded"
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-          <input
-            name="dueDate"
-            type="date"
-            value={newTask.dueDate}
-            onChange={handleInputChange}
-            className="border p-2 rounded"
-          />
-          <button type="submit" className="bg-blue-600 text-white p-2 rounded col-span-full">
-            Create Task
-          </button>
-        </form>
-      )}
-
-      {/* Task list */}
-      {loading ? (
-        <p>Loading tasks...</p>
-      ) : tasks.length === 0 ? (
-        <p>No tasks found</p>
-      ) : (
-        <ul className="space-y-4">
-          {tasks.map((task) => (
-            <li key={task._id} className="border p-4 rounded shadow">
-              {editingTaskId === task._id ? (
-                <form onSubmit={handleUpdateTask} className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <input
-                    name="title"
-                    value={editValues.title}
-                    onChange={handleEditInputChange}
-                    className="border p-2 rounded"
-                    required
-                  />
-                  <input
-                    name="description"
-                    value={editValues.description}
-                    onChange={handleEditInputChange}
-                    className="border p-2 rounded"
-                    required
-                  />
-                  <select
-                    name="priority"
-                    value={editValues.priority}
-                    onChange={handleEditInputChange}
-                    className="border p-2 rounded"
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                  <input
-                    type="date"
-                    name="dueDate"
-                    value={editValues.dueDate}
-                    onChange={handleEditInputChange}
-                    className="border p-2 rounded"
-                  />
-                  <div className="col-span-full flex gap-2">
-                    <button className="bg-green-600 text-white px-3 py-1 rounded" type="submit">
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      className="bg-gray-500 text-white px-3 py-1 rounded"
-                      onClick={() => setEditingTaskId(null)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <>
-                  <div className="font-semibold text-lg">{task.title}</div>
-                  <div className="text-gray-600">{task.description}</div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    Assigned To: {task.assignedTo?.name || "N/A"} | Priority:{" "}
-                    {task.priority} | Due: {task.dueDate?.slice(0, 10) || "N/A"}
-                  </div>
-                  <div className="mt-2 flex gap-2 flex-wrap">
-                    {(currentUser.role === "hr" || currentUser.role === "admin") && (
-                      <>
-                        <button
-                          onClick={() => handleEditTask(task)}
-                          className="bg-yellow-500 text-white px-3 py-1 rounded"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteTask(task._id)}
-                          className="bg-red-600 text-white px-3 py-1 rounded"
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
-                    <button
-                      onClick={() =>
-                        handleStatusChange(
-                          task._id,
-                          task.status === "completed" ? "pending" : "completed"
-                        )
-                      }
-                      className="bg-blue-600 text-white px-3 py-1 rounded"
-                    >
-                      Mark as {task.status === "completed" ? "Pending" : "Completed"}
-                    </button>
-                  </div>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-};
-
-export default TaskManagement;
+module.exports = router;
