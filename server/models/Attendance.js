@@ -6,14 +6,19 @@ const attendanceSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  // Optional: keep if needed for fast read; otherwise remove
   employeeName: {
-    type: String,
-    required: true
+    type: String
+    // Consider removing this if you always populate from User
   },
   date: {
     type: Date,
     required: true,
-    default: Date.now
+    default: () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize date to midnight
+      return today;
+    }
   },
   status: {
     type: String,
@@ -21,7 +26,7 @@ const attendanceSchema = new mongoose.Schema({
     required: true
   },
   checkInTime: {
-    type: String
+    type: Date // Change from String to Date for better accuracy
   },
   markedBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -32,7 +37,7 @@ const attendanceSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Ensure one attendance record per employee per day
+// Enforce unique attendance per employee per day
 attendanceSchema.index({ employeeId: 1, date: 1 }, { unique: true });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);

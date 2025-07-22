@@ -17,35 +17,31 @@ const messageRoutes = require('./routes/messages');
 const app = express();
 const server = http.createServer(app);
 
-// 🔧 Fix CORS for Socket.IO
-const io = socketIo(server, {
-  cors: {
-    origin: [
+// 🌐 CORS Configuration
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',')
+  : [
       "http://localhost:5173",
       "https://employee-on-boarding-system.vercel.app"
-    ],
+    ];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
+app.use(express.json());
+app.use('/uploads', express.static('uploads')); // ⚠️ Only works if uploads folder exists and platform supports local storage
+
+// ⚡ Socket.IO setup
+const io = socketIo(server, {
+  cors: {
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   }
 });
 
-// 🌐 Enable CORS for API routes
-app.use(cors({
-  origin: "*",
-  credentials: true
-}));
-app.use(express.json());
-app.use('/uploads', express.static('uploads'));
-
-// 📦 MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://dheerajgaurcs23:dheerajgaurcs23@cluster0.9gslzuz.mongodb.net/', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('✅ MongoDB connected'))
-.catch(err => console.log('❌ MongoDB connection error:', err));
-
-// ⚡ Socket.IO for real-time messaging
 io.on('connection', (socket) => {
   console.log('⚡ User connected:', socket.id);
 
@@ -62,13 +58,24 @@ io.on('connection', (socket) => {
   });
 });
 
-// 🌍 Make io available in routes via req.io
+// 📦 MongoDB Connection
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('✅ MongoDB connected'))
+.catch(err => {
+  console.error('❌ MongoDB connection error:', err.message);
+  process.exit(1); // Stop the app if DB connection fails
+});
+
+// 🌍 Make io available in all routes
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
-// 🛣️ Routes
+// 🛣️ API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
@@ -78,12 +85,18 @@ app.use('/api/meetings', meetingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/messages', messageRoutes);
 
-// 🔗 Root route
+// 🔗 Root Route
 app.get('/', (req, res) => {
   res.send('✅ Employee Onboarding System Backend is Running!');
 });
 
-// 🚀 Start server
+// ❗ Error Handler
+app.use((err, req, res, next) => {
+  console.error('❌ Unhandled Error:', err.stack);
+  res.status(500).json({ error: 'Something went wrong on the server' });
+});
+
+// 🚀 Start Server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

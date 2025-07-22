@@ -5,17 +5,21 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    minlength: 2
   },
   email: {
     type: String,
     required: true,
     unique: true,
-    lowercase: true
+    lowercase: true,
+    match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address']
   },
   password: {
     type: String,
-    required: true
+    required: true,
+    minlength: 6,
+    select: false // 👈 Prevents password from being returned in queries
   },
   role: {
     type: String,
@@ -24,7 +28,8 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: true
+    required: true,
+    match: [/^[0-9]{10,15}$/, 'Phone number must be valid']
   },
   profilePicture: {
     type: String,
@@ -32,7 +37,8 @@ const userSchema = new mongoose.Schema({
   },
   salary: {
     type: Number,
-    default: 0
+    default: 0,
+    min: 0
   },
   status: {
     type: String,
@@ -54,10 +60,9 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// 🔐 Hash password before saving the user
+// 🔐 Hash password before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -67,7 +72,7 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-// 🔑 Compare input password with hashed password
+// 🔑 Password comparison method
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };

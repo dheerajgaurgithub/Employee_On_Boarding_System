@@ -24,12 +24,15 @@ const meetingSchema = new mongoose.Schema({
     required: true
   },
   duration: {
-    type: Number,
-    default: 60
+    type: Number, // In minutes
+    default: 60,
+    min: 1
   },
   googleMeetLink: {
     type: String,
-    trim: true
+    trim: true,
+    match: /^https?:\/\/(meet\.google\.com)\/[a-z0-9-]+$/i,
+    // Optional: match a Google Meet URL pattern
   },
   status: {
     type: String,
@@ -39,5 +42,21 @@ const meetingSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+// Optional: prevent past scheduling
+meetingSchema.pre('save', function (next) {
+  if (this.isNew && this.dateTime < new Date()) {
+    return next(new Error('Meeting time must be in the future'));
+  }
+  next();
+});
+
+// Optional: virtual field for calculated end time
+meetingSchema.virtual('endTime').get(function () {
+  return new Date(this.dateTime.getTime() + this.duration * 60000);
+});
+
+meetingSchema.set('toJSON', { virtuals: true });
+meetingSchema.set('toObject', { virtuals: true });
 
 module.exports = mongoose.model('Meeting', meetingSchema);

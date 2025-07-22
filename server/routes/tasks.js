@@ -1,41 +1,43 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Task = require('../models/Task');
 const Notification = require('../models/Notification');
 const { auth } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Get tasks
+// GET /api/tasks - Fetch tasks based on role
 router.get('/', auth, async (req, res) => {
   try {
     let query = {};
-    
+
     if (req.user.role === 'employee') {
       query.assignedTo = req.user._id;
     } else if (req.user.role === 'hr') {
       query.assignedBy = req.user._id;
-    } else if (req.user.role === 'admin') {
-      // Admin can see all tasks
-      query = {};
     }
-    
+
     const tasks = await Task.find(query)
       .populate('assignedTo', 'name email role')
       .populate('assignedBy', 'name email role')
       .sort({ createdAt: -1 });
-    
+
     res.json(tasks);
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching tasks:', error.stack || error.message);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Create task
+// POST /api/tasks - Create a task
 router.post('/', auth, async (req, res) => {
   try {
     const { title, description, assignedTo, priority, dueDate } = req.body;
-    
+
+    if (!title || !assignedTo) {
+      return res.status(400).json({ message: 'Title and assignedTo are required' });
+    }
+
     const task = new Task({
       title,
       description,
@@ -44,40 +46,49 @@ router.post('/', auth, async (req, res) => {
       priority,
       dueDate
     });
-    
+
     await task.save();
     await task.populate('assignedTo', 'name email role');
     await task.populate('assignedBy', 'name email role');
-    
-    // Create notification
+
+    // Notify assignee
     const notification = new Notification({
       userId: assignedTo,
       title: 'New Task Assigned',
-      message: `${req.user.name} has assigned you a new task: ${title}`,
+      message: `${req.user.name} assigned you a new task: ${title}`,
       type: 'task'
     });
     await notification.save();
-    
-    // Emit real-time notification
-    req.io.to(assignedTo).emit('new_notification', notification);
-    
+
+    if (req.io) req.io.to(assignedTo.toString()).emit('new_notification', notification);
+
     res.status(201).json(task);
   } catch (error) {
-    console.error(error);
+    console.error('Error creating task:', error.stack || error.message);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Update task
+// PUT /api/tasks/:id - Update task
 router.put('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid task ID' });
+    }
+
+    const originalTask = await Task.findById(id);
+    if (!originalTask) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
     let notifyUserId = null;
     let notificationTitle = '';
     let notificationMessage = '';
 
-    // Handle task completion with submission
+    // Handle task completion
     if (updates.status === 'completed') {
       updates.submittedAt = new Date();
       if (updates.submission) {
@@ -87,29 +98,27 @@ router.put('/:id', auth, async (req, res) => {
           notes: updates.submission.notes
         };
       }
-      // Notify assigner about completion
-      notifyUserId = (await Task.findById(id)).assignedBy;
+      notifyUserId = originalTask.assignedBy;
       notificationTitle = 'Task Completed';
-      notificationMessage = `Task "${updates.title || ''}" has been completed with document submission.`;
+      notificationMessage = `Task "${updates.title || originalTask.title}" was completed.`;
     }
 
-    // Handle approval/rejection by HR/Admin
+    // Approval logic
     if (updates.approvalStatus && ['approved', 'rejected'].includes(updates.approvalStatus)) {
-      const taskDoc = await Task.findById(id);
-      notifyUserId = taskDoc.assignedTo;
+      notifyUserId = originalTask.assignedTo;
       notificationTitle = `Task ${updates.approvalStatus.charAt(0).toUpperCase() + updates.approvalStatus.slice(1)}`;
-      notificationMessage = `Your task "${taskDoc.title}" has been ${updates.approvalStatus}.`;
+      notificationMessage = `Your task "${originalTask.title}" has been ${updates.approvalStatus}.`;
     }
 
-    const task = await Task.findByIdAndUpdate(id, updates, { new: true })
+    const updatedTask = await Task.findByIdAndUpdate(id, updates, { new: true })
       .populate('assignedTo', 'name email role')
       .populate('assignedBy', 'name email role');
 
-    if (!task) {
-      return res.status(404).json({ message: 'Task not found' });
+    if (!updatedTask) {
+      return res.status(404).json({ message: 'Task update failed' });
     }
 
-    // Send notification if needed
+    // Notify based on changes
     if (notifyUserId && notificationTitle && notificationMessage) {
       const notification = new Notification({
         userId: notifyUserId,
@@ -118,42 +127,34 @@ router.put('/:id', auth, async (req, res) => {
         type: 'task'
       });
       await notification.save();
-      req.io.to(notifyUserId.toString()).emit('new_notification', notification);
+      if (req.io) req.io.to(notifyUserId.toString()).emit('new_notification', notification);
     }
 
-    // Notify assigner about status change (if not already notified)
-    if (updates.status && !notifyUserId) {
-      const notification = new Notification({
-        userId: task.assignedBy._id,
-        title: 'Task Status Updated',
-        message: `Task "${task.title}" status changed to ${updates.status}`,
-        type: 'task'
-      });
-      await notification.save();
-      req.io.to(task.assignedBy._id.toString()).emit('new_notification', notification);
-    }
-
-    res.json(task);
+    res.json(updatedTask);
   } catch (error) {
-    console.error(error);
+    console.error('Error updating task:', error.stack || error.message);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Approve or reject a submitted task (HR/Admin only)
+// PUT /api/tasks/:id/approval - Approve/reject task
 router.put('/:id/approval', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const { approvalStatus } = req.body;
+
     if (!['approved', 'rejected'].includes(approvalStatus)) {
       return res.status(400).json({ message: 'Invalid approval status' });
     }
+
     const task = await Task.findByIdAndUpdate(id, { approvalStatus }, { new: true })
       .populate('assignedTo', 'name email role')
       .populate('assignedBy', 'name email role');
+
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
+
     // Notify employee
     const notification = new Notification({
       userId: task.assignedTo._id,
@@ -162,33 +163,37 @@ router.put('/:id/approval', auth, async (req, res) => {
       type: 'task'
     });
     await notification.save();
-    req.io.to(task.assignedTo._id.toString()).emit('new_notification', notification);
+    if (req.io) req.io.to(task.assignedTo._id.toString()).emit('new_notification', notification);
+
     res.json(task);
   } catch (error) {
-    console.error(error);
+    console.error('Error approving task:', error.stack || error.message);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Delete task
+// DELETE /api/tasks/:id - Delete task
 router.delete('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
-    
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid task ID' });
+    }
+
     const task = await Task.findById(id);
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
-    
-    // Only task assigner can delete
+
     if (task.assignedBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Access denied' });
+      return res.status(403).json({ message: 'Access denied. Only assigner can delete the task.' });
     }
-    
+
     await Task.findByIdAndDelete(id);
     res.json({ message: 'Task deleted successfully' });
   } catch (error) {
-    console.error(error);
+    console.error('Error deleting task:', error.stack || error.message);
     res.status(500).json({ message: 'Server error' });
   }
 });

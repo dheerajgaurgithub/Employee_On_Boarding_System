@@ -1,10 +1,29 @@
 const mongoose = require('mongoose');
 
+// 📝 Embedded subdocument for task submissions
+const submissionSchema = new mongoose.Schema({
+  documentUrl: {
+    type: String,
+    trim: true,
+    match: /^https?:\/\/.+/ // Optional: basic URL validation
+  },
+  documentType: {
+    type: String,
+    enum: ['pdf', 'text', 'other'],
+    default: 'other'
+  },
+  notes: {
+    type: String,
+    trim: true
+  }
+}, { _id: false });
+
 const taskSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    minlength: 3
   },
   description: {
     type: String,
@@ -41,23 +60,17 @@ const taskSchema = new mongoose.Schema({
   submittedAt: {
     type: Date
   },
-  submission: {
-    documentUrl: {
-      type: String,
-      trim: true
-    },
-    documentType: {
-      type: String,
-      enum: ['pdf', 'text', 'other'],
-      default: 'other'
-    },
-    notes: {
-      type: String,
-      trim: true
-    }
-  }
+  submission: submissionSchema
 }, {
   timestamps: true
+});
+
+// Optional: pre-save hook to set `submittedAt` if submission is added
+taskSchema.pre('save', function (next) {
+  if (this.submission && !this.submittedAt) {
+    this.submittedAt = new Date();
+  }
+  next();
 });
 
 module.exports = mongoose.model('Task', taskSchema);

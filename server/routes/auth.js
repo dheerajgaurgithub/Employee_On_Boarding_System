@@ -10,21 +10,17 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log('Login request:', email);
-
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
-      console.log('User not found for email:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      console.log('Invalid password for user:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
@@ -34,7 +30,7 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET || 'defaultsecret', // fallback if .env not loaded
+      process.env.JWT_SECRET || 'defaultsecret',
       { expiresIn: '7d' }
     );
 
@@ -50,13 +46,14 @@ router.post('/login', async (req, res) => {
         salary: user.salary,
         status: user.status,
         isOnline: user.isOnline,
-        createdBy: user.createdBy
+        createdBy: user.createdBy,
+        lastLogin: user.lastLogin
       }
     });
 
   } catch (error) {
-    console.error('Login route error:', error);
-    return res.status(500).json({ message: 'Server error' });
+    console.error('🔐 Login Error:', error.stack || error.message);
+    return res.status(500).json({ message: 'Server error during login' });
   }
 });
 
@@ -71,8 +68,8 @@ router.post('/logout', auth, async (req, res) => {
 
     res.json({ message: 'Logged out successfully' });
   } catch (error) {
-    console.error('Logout error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('🔐 Logout Error:', error.stack || error.message);
+    res.status(500).json({ message: 'Server error during logout' });
   }
 });
 
@@ -85,8 +82,8 @@ router.get('/me', auth, async (req, res) => {
     }
     res.json(user);
   } catch (error) {
-    console.error('Fetch current user error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('🔐 Fetch Current User Error:', error.stack || error.message);
+    res.status(500).json({ message: 'Server error fetching current user' });
   }
 });
 

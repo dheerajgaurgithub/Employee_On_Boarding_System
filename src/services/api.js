@@ -1,96 +1,72 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
-  withCredentials: true
-});
-
+const apiUrl = import.meta.env.VITE_API_URL;
+console.log('🔗 API URL:', apiUrl);
 
 class ApiService {
   constructor() {
-    this.token = localStorage.getItem('token');
+    this.api = axios.create({
+      baseURL: apiUrl,
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.setToken(token);
+    }
   }
 
   setToken(token) {
     this.token = token;
+
     if (token) {
       localStorage.setItem('token', token);
+      this.api.defaults.headers.Authorization = `Bearer ${token}`;
     } else {
       localStorage.removeItem('token');
+      delete this.api.defaults.headers.Authorization;
     }
-  }
-
-  getHeaders() {
-    const token = this.token || localStorage.getItem('token');
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    return headers;
   }
 
   async request(endpoint, options = {}) {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const config = {
-      headers: this.getHeaders(),
-      ...options,
-    };
-
     try {
-      const response = await fetch(url, config);
-      let data;
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        const text = await response.text();
-        throw new Error(text || 'Invalid response format');
-      }
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          console.warn('⚠️ Unauthorized! Removing invalid token.');
-          this.setToken(null);
-          window.location.href = '/login';
-          throw new Error('Session expired. Please login again.');
-        } else if (response.status === 403) {
-          throw new Error('Access denied. You do not have permission for this action.');
-        } else if (response.status === 404) {
-          throw new Error('Resource not found.');
-        }
-        throw new Error(data.message || 'Server error');
-      }
-
-      return data;
+      const response = await this.api(endpoint, options);
+      return response.data;
     } catch (error) {
-      if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
-        throw new Error('Network error. Please check your connection.');
+      const status = error.response?.status;
+      const message = error.response?.data?.message || error.message;
+
+      console.error('❌ API Error:', message);
+
+      if (status === 401) {
+        this.setToken(null);
+        window.location.href = '/login';
+        throw new Error('Session expired. Please login again.');
+      } else if (status === 403) {
+        throw new Error('Access denied.');
+      } else if (status === 404) {
+        throw new Error('Resource not found.');
       }
-      console.error('❌ API Error:', error);
-      throw error;
+
+      throw new Error(message);
     }
   }
 
   // -------------------- Auth --------------------
   async login(email, password) {
-    try {
-      const response = await this.request('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-      });
+    const response = await this.request('/auth/login', {
+      method: 'POST',
+      data: { email, password },
+    });
 
-      if (response.token) {
-        this.setToken(response.token);
-      }
-
-      return response;
-    } catch (error) {
-      throw new Error(error.message || 'Login failed');
+    if (response.token) {
+      this.setToken(response.token);
     }
+
+    return response;
   }
 
   async logout() {
@@ -117,24 +93,17 @@ class ApiService {
   async createUser(userData) {
     return this.request('/users', {
       method: 'POST',
-      body: JSON.stringify(userData),
+      data: userData,
     });
   }
 
   async updateUser(userId, updates) {
-    if (!userId) {
-      throw new Error('User ID is required for update');
-    }
+    if (!userId) throw new Error('User ID is required');
 
-    try {
-      return await this.request(`/users/${userId}`, {
-        method: 'PUT',
-        body: JSON.stringify(updates),
-      });
-    } catch (error) {
-      console.error(`Failed to update user ${userId}:`, error);
-      throw error;
-    }
+    return this.request(`/users/${userId}`, {
+      method: 'PUT',
+      data: updates,
+    });
   }
 
   async deleteUser(userId) {
@@ -149,14 +118,14 @@ class ApiService {
   async createTask(taskData) {
     return this.request('/tasks', {
       method: 'POST',
-      body: JSON.stringify(taskData),
+      data: taskData,
     });
   }
 
   async updateTask(taskId, updates) {
     return this.request(`/tasks/${taskId}`, {
       method: 'PUT',
-      body: JSON.stringify(updates),
+      data: updates,
     });
   }
 
@@ -172,14 +141,14 @@ class ApiService {
   async createLeave(leaveData) {
     return this.request('/leaves', {
       method: 'POST',
-      body: JSON.stringify(leaveData),
+      data: leaveData,
     });
   }
 
   async updateLeave(leaveId, updates) {
     return this.request(`/leaves/${leaveId}`, {
       method: 'PUT',
-      body: JSON.stringify(updates),
+      data: updates,
     });
   }
 
@@ -199,7 +168,7 @@ class ApiService {
   async markAttendance(attendanceData) {
     return this.request('/attendance', {
       method: 'POST',
-      body: JSON.stringify(attendanceData),
+      data: attendanceData,
     });
   }
 
@@ -211,14 +180,14 @@ class ApiService {
   async createMeeting(meetingData) {
     return this.request('/meetings', {
       method: 'POST',
-      body: JSON.stringify(meetingData),
+      data: meetingData,
     });
   }
 
   async updateMeeting(meetingId, updates) {
     return this.request(`/meetings/${meetingId}`, {
       method: 'PUT',
-      body: JSON.stringify(updates),
+      data: updates,
     });
   }
 
@@ -230,7 +199,7 @@ class ApiService {
   async createNotification(notificationData) {
     return this.request('/notifications', {
       method: 'POST',
-      body: JSON.stringify(notificationData),
+      data: notificationData,
     });
   }
 
@@ -254,7 +223,7 @@ class ApiService {
   async sendMessage(messageData) {
     return this.request('/messages', {
       method: 'POST',
-      body: JSON.stringify(messageData),
+      data: messageData,
     });
   }
 
