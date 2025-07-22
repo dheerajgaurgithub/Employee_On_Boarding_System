@@ -24,11 +24,11 @@ export const DataProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // -------------------- Loaders --------------------
+  // ----------- Loaders -----------
   const loadTasks = useCallback(async () => {
     try {
       const data = await apiService.getTasks();
-      setTasks(data);
+      setTasks(data || []);
     } catch (error) {
       console.error('Failed to load tasks:', error);
       setError('Failed to load tasks');
@@ -38,7 +38,7 @@ export const DataProvider = ({ children }) => {
   const loadLeaves = useCallback(async () => {
     try {
       const data = await apiService.getLeaves();
-      setLeaveRequests(data);
+      setLeaveRequests(data || []);
     } catch (error) {
       console.error('Failed to load leaves:', error);
       setError('Failed to load leave requests');
@@ -48,7 +48,7 @@ export const DataProvider = ({ children }) => {
   const loadAttendance = useCallback(async () => {
     try {
       const data = await apiService.getAttendance();
-      setAttendance(data);
+      setAttendance(data || []);
     } catch (error) {
       console.error('Failed to load attendance:', error);
       setError('Failed to load attendance');
@@ -58,7 +58,7 @@ export const DataProvider = ({ children }) => {
   const loadMeetings = useCallback(async () => {
     try {
       const data = await apiService.getMeetings();
-      setMeetings(data);
+      setMeetings(data || []);
     } catch (error) {
       console.error('Failed to load meetings:', error);
       setError('Failed to load meetings');
@@ -68,14 +68,14 @@ export const DataProvider = ({ children }) => {
   const loadNotifications = useCallback(async () => {
     try {
       const data = await apiService.getNotifications();
-      setNotifications(data);
+      setNotifications(data || []);
     } catch (error) {
       console.error('Failed to load notifications:', error);
       setError('Failed to load notifications');
     }
   }, []);
 
-  // -------------------- Task Methods --------------------
+  // ----------- Task Methods -----------
   const addTask = async (taskData) => {
     try {
       const task = await apiService.createTask(taskData);
@@ -98,21 +98,13 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const getTasksByUser = useCallback((userId) => 
-    tasks.filter(t => {
-      if (!t.assignedTo) return false;
-      if (typeof t.assignedTo === 'object') return t.assignedTo._id === userId;
-      return t.assignedTo === userId;
-    }), [tasks]);
+  const getTasksByUser = useCallback((userId) =>
+    tasks.filter(t => t.assignedTo?._id === userId || t.assignedTo === userId), [tasks]);
 
-  const getTasksByAssigner = useCallback((assignerId) => 
-    tasks.filter(t => {
-      if (!t.assignedBy) return false;
-      if (typeof t.assignedBy === 'object') return t.assignedBy._id === assignerId;
-      return t.assignedBy === assignerId;
-    }), [tasks]);
+  const getTasksByAssigner = useCallback((assignerId) =>
+    tasks.filter(t => t.assignedBy?._id === assignerId || t.assignedBy === assignerId), [tasks]);
 
-  // -------------------- Leave Methods --------------------
+  // ----------- Leave Methods -----------
   const addLeaveRequest = async (data) => {
     try {
       const leave = await apiService.createLeave(data);
@@ -135,21 +127,13 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const getLeavesByUser = useCallback((userId) => 
-    leaveRequests.filter(l => {
-      if (!l.employeeId) return false;
-      if (typeof l.employeeId === 'object') return l.employeeId._id === userId;
-      return l.employeeId === userId;
-    }), [leaveRequests]);
+  const getLeavesByUser = useCallback((userId) =>
+    leaveRequests.filter(l => l.employeeId?._id === userId || l.employeeId === userId), [leaveRequests]);
 
-  const getLeavesByApprover = useCallback((approverId) => 
-    leaveRequests.filter(l => {
-      if (!l.appliedTo) return false;
-      if (typeof l.appliedTo === 'object') return l.appliedTo._id === approverId;
-      return l.appliedTo === approverId;
-    }), [leaveRequests]);
+  const getLeavesByApprover = useCallback((approverId) =>
+    leaveRequests.filter(l => l.appliedTo?._id === approverId || l.appliedTo === approverId), [leaveRequests]);
 
-  // -------------------- Attendance Methods --------------------
+  // ----------- Attendance Methods -----------
   const addAttendance = async (data) => {
     try {
       const entry = await apiService.markAttendance(data);
@@ -161,15 +145,15 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const getAttendanceByUser = useCallback((userId) => 
-    attendance.filter(a => a.employeeId && a.employeeId._id === userId), [attendance]);
+  const getAttendanceByUser = useCallback((userId) =>
+    attendance.filter(a => a.employeeId?._id === userId), [attendance]);
 
   const getTodayAttendance = useCallback(() => {
     const today = new Date().toDateString();
     return attendance.filter(a => new Date(a.date).toDateString() === today);
   }, [attendance]);
 
-  // -------------------- Meeting Methods --------------------
+  // ----------- Meeting Methods -----------
   const addMeeting = async (data) => {
     try {
       const meeting = await apiService.createMeeting(data);
@@ -192,10 +176,13 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const getMeetingsByUser = useCallback((userId) => 
-    meetings.filter(m => (m.scheduledBy && m.scheduledBy._id === userId) || (m.attendees && m.attendees.some(a => a && a._id === userId))), [meetings]);
+  const getMeetingsByUser = useCallback((userId) =>
+    meetings.filter(m =>
+      m.scheduledBy?._id === userId ||
+      (m.attendees && m.attendees.some(a => a?._id === userId))
+    ), [meetings]);
 
-  // -------------------- Notification Methods --------------------
+  // ----------- Notification Methods -----------
   const addNotification = async (data) => {
     try {
       const notification = await apiService.createNotification(data);
@@ -209,10 +196,10 @@ export const DataProvider = ({ children }) => {
 
   const markNotificationRead = async (id) => {
     try {
-      const updatedNotification = await apiService.markNotificationRead(id);
+      const updated = await apiService.markNotificationRead(id);
       setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
       await loadNotifications();
-      return updatedNotification;
+      return updated;
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
       throw error;
@@ -231,11 +218,11 @@ export const DataProvider = ({ children }) => {
 
   const getNotificationsByUser = useCallback((userId) =>
     notifications
-      .filter(n => (n.userId === userId) || (n.userId && n.userId._id === userId))
+      .filter(n => n.userId === userId || n.userId?._id === userId)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)), [notifications]);
 
-  // -------------------- Message Methods --------------------
-  const loadMessages = async (userId) => {
+  // ----------- Message Methods -----------
+  const loadMessages = useCallback(async (userId) => {
     try {
       const data = await apiService.getMessages(userId);
       setMessages(data);
@@ -244,13 +231,13 @@ export const DataProvider = ({ children }) => {
       console.error('Failed to load messages:', error);
       throw error;
     }
-  };
+  }, []);
 
   const addMessage = async (data) => {
     try {
       const msg = await apiService.sendMessage(data);
       setMessages(prev => [...prev, msg]);
-      await loadNotifications(); // Refresh notifications after sending a message
+      await loadNotifications(); // sync notifications
       return msg;
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -267,42 +254,37 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const getUsersByRole = async (role) => {
-  try {
-    const response = await apiService.getUsersByRole(role); // make sure this function exists in your API service
-    return response;
-  } catch (error) {
-    console.error(`Failed to get users by role: ${role}`, error);
-    return [];
-  }
-};
-
-  const getMessagesBetweenUsers = useCallback((u1, u2) => 
+  const getMessagesBetweenUsers = useCallback((u1, u2) =>
     messages
       .filter(m => {
-        const senderId = typeof m.senderId === 'object' ? m.senderId._id : m.senderId;
-        const receiverId = typeof m.receiverId === 'object' ? m.receiverId._id : m.receiverId;
-        return (
-          (senderId === u1 && receiverId === u2) || 
-          (senderId === u2 && receiverId === u1)
-        );
+        const sender = m.senderId?._id || m.senderId;
+        const receiver = m.receiverId?._id || m.receiverId;
+        return (sender === u1 && receiver === u2) || (sender === u2 && receiver === u1);
       })
       .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)), [messages]);
 
-  // -------------------- Auto-load when currentUser changes --------------------
+  // ----------- Utility Methods -----------
+  const getUsersByRole = async (role) => {
+    try {
+      return await apiService.getUsersByRole(role.toLowerCase());
+    } catch (error) {
+      console.error(`Failed to get users by role (${role})`, error);
+      return [];
+    }
+  };
+
   const loadAllData = useCallback(async () => {
     if (!currentUser) return;
-    
     setLoading(true);
     setError(null);
-    
+
     try {
       await Promise.all([
         loadTasks(),
         loadLeaves(),
         loadAttendance(),
         loadMeetings(),
-        loadNotifications()
+        loadNotifications(),
       ]);
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -316,30 +298,24 @@ export const DataProvider = ({ children }) => {
     loadAllData();
   }, [loadAllData]);
 
-  // Refresh data periodically
   useEffect(() => {
     if (!currentUser) return;
-
-    const interval = setInterval(() => {
-      loadNotifications(); // Refresh notifications every minute
-    }, 60000);
-
+    const interval = setInterval(loadNotifications, 60000); // refresh every minute
     return () => clearInterval(interval);
   }, [currentUser, loadNotifications]);
 
   return (
     <DataContext.Provider value={{
-  tasks, addTask, updateTask, getTasksByUser, getTasksByAssigner,
-  leaveRequests, addLeaveRequest, updateLeaveRequest, getLeavesByUser, getLeavesByApprover,
-  attendance, addAttendance, getAttendanceByUser, getTodayAttendance,
-  meetings, addMeeting, updateMeeting, getMeetingsByUser,
-  notifications, addNotification, markNotificationRead, markAllNotificationsRead, getNotificationsByUser,
-  messages, loadMessages, addMessage, getMessagesBetweenUsers,
-  loading, error, refresh: loadAllData,
-  getUsersByRole // ✅ ADD THIS
-}}>
-  {children}
-</DataContext.Provider>
-
+      tasks, addTask, updateTask, getTasksByUser, getTasksByAssigner,
+      leaveRequests, addLeaveRequest, updateLeaveRequest, getLeavesByUser, getLeavesByApprover,
+      attendance, addAttendance, getAttendanceByUser, getTodayAttendance,
+      meetings, addMeeting, updateMeeting, getMeetingsByUser,
+      notifications, addNotification, markNotificationRead, markAllNotificationsRead, getNotificationsByUser,
+      messages, loadMessages, addMessage, getMessagesBetweenUsers,
+      loading, error, refresh: loadAllData,
+      getUsersByRole
+    }}>
+      {children}
+    </DataContext.Provider>
   );
 };

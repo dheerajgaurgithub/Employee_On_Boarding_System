@@ -46,7 +46,7 @@ const Login = () => {
   };
 
   const fillAdminCredentials = () => {
-    setEmail('admin@gla.ac.in');
+    setEmail('admin@onboarding.in');
     setPassword('admin@123');
   };
 
@@ -213,7 +213,7 @@ const Login = () => {
                       onClick={fillAdminCredentials}
                       className="text-purple-400 hover:text-purple-300 text-xs sm:text-sm font-medium transition-colors duration-300 hover:underline break-all"
                     >
-                      Use Admin Login (admin@gla.ac.in / admin@123)
+                      Use Admin Login (admin@onboarding.in / admin@123)
                     </button>
                   </div>
                 </div>

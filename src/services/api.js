@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL || 'https://employee-on-boarding-system.onrender.com/api';
 console.log('🔗 API URL:', apiUrl);
 
 class ApiService {
@@ -33,7 +33,11 @@ class ApiService {
 
   async request(endpoint, options = {}) {
     try {
-      const response = await this.api(endpoint, options);
+      const response = await this.api.request({
+        url: endpoint.startsWith('/') ? endpoint : `/${endpoint}`,
+        ...options,
+      });
+
       return response.data;
     } catch (error) {
       const status = error.response?.status;
@@ -99,7 +103,6 @@ class ApiService {
 
   async updateUser(userId, updates) {
     if (!userId) throw new Error('User ID is required');
-
     return this.request(`/users/${userId}`, {
       method: 'PUT',
       data: updates,

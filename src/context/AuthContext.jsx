@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Load current user from token
+  // Load current user if token exists
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -32,63 +32,68 @@ export const AuthProvider = ({ children }) => {
       const user = await apiService.getCurrentUser();
       setCurrentUser(user);
     } catch (error) {
-      console.error('Failed to load current user:', error);
-      localStorage.removeItem('token');
-      apiService.setToken(null);
+      console.error('❌ Failed to load current user:', error);
+      logout();
     } finally {
       setLoading(false);
     }
   };
 
   const loadUsers = async () => {
-    if (!currentUser?.role) {
-      console.warn('No user role to determine user scope.');
-      return;
-    }
+    if (!currentUser?.role) return;
 
     try {
       let allUsers = [];
 
-      if (currentUser.role === 'admin') {
-        allUsers = await apiService.getUsers();
-      } else if (currentUser.role === 'hr') {
-        const [employees, admins] = await Promise.all([
-          apiService.getUsersByRole('employee'),
-          apiService.getUsersByRole('admin'),
-        ]);
-        allUsers = [...employees, ...admins];
-      } else if (currentUser.role === 'employee') {
-        const hrs = await apiService.getUsersByRole('hr');
-        allUsers = hrs.filter(hr => hr._id === currentUser.createdBy);
+      switch (currentUser.role) {
+        case 'admin':
+          allUsers = await apiService.getUsers();
+          break;
+
+        case 'hr':
+          const [employees, admins] = await Promise.all([
+            apiService.getUsersByRole('employee'),
+            apiService.getUsersByRole('admin'),
+          ]);
+          allUsers = [...employees, ...admins];
+          break;
+
+        case 'employee':
+          const hrs = await apiService.getUsersByRole('hr');
+          allUsers = hrs.filter(hr => hr._id === currentUser.createdBy);
+          break;
+
+        default:
+          console.warn('Unknown role:', currentUser.role);
       }
 
       setUsers(allUsers);
     } catch (error) {
-      console.error('Failed to load users:', error);
+      console.error('❌ Failed to load users:', error);
     }
   };
 
   const login = async (email, password) => {
     try {
       const response = await apiService.login(email, password);
-      localStorage.setItem('token', response.token);
+      apiService.setToken(response.token);
       setCurrentUser(response.user);
-      return true;
+      return { success: true, user: response.user };
     } catch (error) {
-      console.error('Login failed:', error);
-      return false;
+      console.error('❌ Login failed:', error.message);
+      return { success: false, message: error.message };
     }
   };
 
   const logout = async () => {
     try {
       await apiService.logout();
-    } catch (error) {
-      console.error('Logout error:', error);
+    } catch (err) {
+      console.warn('Logout error (ignored):', err);
     }
-    setCurrentUser(null);
     apiService.setToken(null);
     localStorage.removeItem('token');
+    setCurrentUser(null);
   };
 
   const addUser = async (userData) => {
@@ -97,7 +102,7 @@ export const AuthProvider = ({ children }) => {
       await loadUsers();
       return response;
     } catch (error) {
-      console.error('Failed to add user:', error);
+      console.error('❌ Failed to add user:', error);
       throw error;
     }
   };
@@ -113,7 +118,7 @@ export const AuthProvider = ({ children }) => {
       }
       return updatedUser;
     } catch (error) {
-      console.error('Failed to update user:', error);
+      console.error('❌ Failed to update user:', error);
       throw error;
     }
   };
@@ -126,8 +131,8 @@ export const AuthProvider = ({ children }) => {
     }
 
     if (role === 'employee' && currentUser.role === 'hr') {
-      return users.filter(
-        user => user.role === 'employee' && user.createdBy === currentUser._id
+      return users.filter(user =>
+        user.role === 'employee' && user.createdBy === currentUser._id
       );
     }
 
@@ -142,10 +147,9 @@ export const AuthProvider = ({ children }) => {
     return users.find(user => user._id === id);
   };
 
+  // Reload users when user logs in
   useEffect(() => {
-    if (currentUser) {
-      loadUsers();
-    }
+    if (currentUser) loadUsers();
   }, [currentUser]);
 
   const value = {
@@ -164,7 +168,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {loading ? <div>Loading...</div> : children}
     </AuthContext.Provider>
   );
 };

@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const createAdmin = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/employee_onboarding', {
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://dheerajgaurcs23:dheerajgaur_mongodb@cluster0.jigwlh0.mongodb.net/Employee_Onboarding_System?retryWrites=true&w=majority', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -20,7 +20,7 @@ const createAdmin = async () => {
     const admin = new User({
       name: 'System Administrator',
       email: 'admin@onboading.in',
-      password: 'admin@2816', // Hardcoded password
+      password: 'admin@123', // Hardcoded password
       role: 'admin',
       phone: '+91-9876543210',
       profilePicture: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150',
@@ -30,7 +30,7 @@ const createAdmin = async () => {
     await admin.save();
 
     console.log('\n✅ Admin user created successfully:');
-    console.log('📧 Email: admin@gla.ac.in');
+    console.log('📧 Email: admin@onboading.in');
     console.log('🔐 Password: admin@123\n');
 
     process.exit(0);

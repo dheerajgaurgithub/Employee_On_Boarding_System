@@ -3,7 +3,7 @@ export const initialUsers = [
   {
     id: 'admin-1',
     name: 'System Administrator',
-    email: 'admin@gla.ac.in',
+    email: 'admin@onboarding.in',
     password: 'admin@123',
     role: 'admin',
     phone: '+91-9876543210',
