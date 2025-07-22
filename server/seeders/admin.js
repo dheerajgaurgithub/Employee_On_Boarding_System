@@ -10,7 +10,7 @@ const createAdmin = async () => {
       useUnifiedTopology: true,
     });
 
-    const adminEmail = 'admin@onboarding.in';
+    const adminEmail = 'superadmin@onboarding.in';
 
     // Check if admin already exists
     const existingAdmin = await User.findOne({ email: adminEmail });
@@ -20,7 +20,7 @@ const createAdmin = async () => {
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash('admin@123', 10);
+    const hashedPassword = await bcrypt.hash('supersecure@2025', 10);
 
     // Create new admin user
     const admin = new User({
@@ -28,7 +28,7 @@ const createAdmin = async () => {
       email: adminEmail,
       password: hashedPassword,
       role: 'admin',
-      phone: '+91-9876543210',
+      phone: "+919927270090",
       profilePicture: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150',
       status: 'active',
     });
@@ -36,8 +36,8 @@ const createAdmin = async () => {
     await admin.save();
 
     console.log('\n✅ Admin user created successfully:');
-    console.log('📧 Email: admin@onboarding.in');
-    console.log('🔐 Password: admin@123\n');
+    console.log('📧 Email: superadmin@onboarding.in');
+    console.log('🔐 Password: supersecure@2025\n');
 
     process.exit(0);
   } catch (error) {

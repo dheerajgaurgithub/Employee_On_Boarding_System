@@ -29,8 +29,8 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: true,
-    match: [/^[0-9]{10,15}$/, 'Phone number must be valid']
   },
+
   profilePicture: {
     type: String,
     default: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150'
