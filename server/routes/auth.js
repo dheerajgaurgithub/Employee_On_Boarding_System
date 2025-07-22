@@ -1,9 +1,11 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt'); // ✅ REQUIRED IMPORT
 const User = require('../models/User');
 const { auth } = require('../middleware/auth');
 
 const router = express.Router();
+
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
