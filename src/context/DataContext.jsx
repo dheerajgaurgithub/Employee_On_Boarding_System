@@ -267,6 +267,16 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const getUsersByRole = async (role) => {
+  try {
+    const response = await apiService.getUsersByRole(role); // make sure this function exists in your API service
+    return response;
+  } catch (error) {
+    console.error(`Failed to get users by role: ${role}`, error);
+    return [];
+  }
+};
+
   const getMessagesBetweenUsers = useCallback((u1, u2) => 
     messages
       .filter(m => {
@@ -319,15 +329,17 @@ export const DataProvider = ({ children }) => {
 
   return (
     <DataContext.Provider value={{
-      tasks, addTask, updateTask, getTasksByUser, getTasksByAssigner,
-      leaveRequests, addLeaveRequest, updateLeaveRequest, getLeavesByUser, getLeavesByApprover,
-      attendance, addAttendance, getAttendanceByUser, getTodayAttendance,
-      meetings, addMeeting, updateMeeting, getMeetingsByUser,
-      notifications, addNotification, markNotificationRead, markAllNotificationsRead, getNotificationsByUser,
-      messages, loadMessages, addMessage, getMessagesBetweenUsers,
-      loading, error, refresh: loadAllData
-    }}>
-      {children}
-    </DataContext.Provider>
+  tasks, addTask, updateTask, getTasksByUser, getTasksByAssigner,
+  leaveRequests, addLeaveRequest, updateLeaveRequest, getLeavesByUser, getLeavesByApprover,
+  attendance, addAttendance, getAttendanceByUser, getTodayAttendance,
+  meetings, addMeeting, updateMeeting, getMeetingsByUser,
+  notifications, addNotification, markNotificationRead, markAllNotificationsRead, getNotificationsByUser,
+  messages, loadMessages, addMessage, getMessagesBetweenUsers,
+  loading, error, refresh: loadAllData,
+  getUsersByRole // ✅ ADD THIS
+}}>
+  {children}
+</DataContext.Provider>
+
   );
 };
