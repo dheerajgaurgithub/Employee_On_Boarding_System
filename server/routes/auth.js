@@ -6,62 +6,41 @@ const { auth } = require('../middleware/auth');
 
 const router = express.Router();
 
-/**
- * @route   POST /api/auth/login
- * @desc    Authenticate user and return token
- */
+// POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('📩 Login attempt with email:', email);
 
     if (!email || !password) {
-      console.warn('⚠️ Missing email or password');
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
     const user = await User.findOne({ email });
-    if (!user) {
-      console.warn('⚠️ No user found for email:', email);
-      return res.status(401).json({ message: 'Invalid credentials' });
+    if (!user || !user.password) {
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.warn('⚠️ Incorrect password for:', email);
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     if (!process.env.JWT_SECRET) {
-      console.error('❌ JWT_SECRET not defined in environment');
-      return res.status(500).json({ message: 'Server misconfiguration: JWT secret missing' });
+      return res.status(500).json({ message: 'JWT_SECRET is not defined in .env' });
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: '1d',
     });
 
-    console.log('✅ Login successful:', email);
-
-    res.json({
-      token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    });
+    res.status(200).json({ token, user });
   } catch (error) {
-    console.error('❌ Login error:', error.stack || error.message);
+    console.error('❌ Login error:', error);
     res.status(500).json({ message: 'Server error during login' });
   }
 });
 
-/**
- * @route   POST /api/auth/logout
- * @desc    Logout user
- */
+// POST /api/auth/logout
 router.post('/logout', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -69,28 +48,23 @@ router.post('/logout', auth, async (req, res) => {
       user.isOnline = false;
       await user.save();
     }
-
     res.json({ message: 'Logged out successfully' });
   } catch (error) {
-    console.error('🔐 Logout error:', error.stack || error.message);
+    console.error('🔐 Logout Error:', error);
     res.status(500).json({ message: 'Server error during logout' });
   }
 });
 
-/**
- * @route   GET /api/auth/me
- * @desc    Get current logged-in user
- */
+// GET /api/auth/me
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
     res.json(user);
   } catch (error) {
-    console.error('🔐 Fetch current user error:', error.stack || error.message);
+    console.error('🔐 Fetch Current User Error:', error);
     res.status(500).json({ message: 'Server error fetching current user' });
   }
 });
