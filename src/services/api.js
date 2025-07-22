@@ -8,20 +8,13 @@ class ApiService {
     this.api = axios.create({
       baseURL: apiUrl,
       withCredentials: true,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     });
-
     const token = localStorage.getItem('token');
-    if (token) {
-      this.setToken(token);
-    }
+    if (token) this.setToken(token);
   }
 
   setToken(token) {
-    this.token = token;
-
     if (token) {
       localStorage.setItem('token', token);
       this.api.defaults.headers.Authorization = `Bearer ${token}`;
@@ -33,43 +26,32 @@ class ApiService {
 
   async request(endpoint, options = {}) {
     try {
-      const response = await this.api.request({
+      const res = await this.api.request({
         url: endpoint.startsWith('/') ? endpoint : `/${endpoint}`,
         ...options,
       });
-
-      return response.data;
-    } catch (error) {
-      const status = error.response?.status;
-      const message = error.response?.data?.message || error.message;
-
-      console.error('❌ API Error:', message);
-
+      return res.data;
+    } catch (err) {
+      const status = err.response?.status;
+      const msg = err.response?.data?.message || err.message;
+      console.error('❌ API Error:', msg);
       if (status === 401) {
         this.setToken(null);
         window.location.href = '/login';
         throw new Error('Session expired. Please login again.');
-      } else if (status === 403) {
-        throw new Error('Access denied.');
-      } else if (status === 404) {
-        throw new Error('Resource not found.');
       }
-
-      throw new Error(message);
+      if (status === 403) throw new Error('Access denied.');
+      if (status === 404) throw new Error('Resource not found.');
+      throw new Error(msg);
     }
   }
 
-  // -------------------- Auth --------------------
   async login(email, password) {
     const response = await this.request('/auth/login', {
       method: 'POST',
       data: { email, password },
     });
-
-    if (response.token) {
-      this.setToken(response.token);
-    }
-
+    if (response.token) this.setToken(response.token);
     return response;
   }
 
